@@ -2,20 +2,62 @@ const socket = io();
 const patch = '14.17.1'
 const baseUrl = `http://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
-let currentPick = 1;
+let currPick = 1;
 let matchNumber = 3;
 const preloadedImages = {};
+const preloadedIcons = {};
+let usedChamps = new Set();
+
+function getCurrSlot(){
+    if(currPick <= 6){
+        return currPick % 2 === 1 ? `BB${Math.ceil(currPick/2)}` : `RB${Math.ceil(currPick/2)}`;
+    } else if(currPick <= 12){
+        switch(currPick){
+            case 7:
+                return 'BP1';
+            case 8:
+                return 'RP1';
+            case 9:
+                return 'RP2';
+            case 10:
+                return 'BP2';
+            case 11:
+                return 'BP3';
+            case 12:
+                return 'RP3';
+        }
+    } else if(currPick <= 16){
+        return currPick % 2 === 0 ? `BB${Math.ceil(currPick/2)-3}` : `RB${Math.ceil(currPick/2)-3}`;
+    } else if(currPick <= 20) {
+        switch(currPick){
+            case 17:
+                return 'RP4';
+            case 18:
+                return 'BP4';
+            case 19:
+                return 'BP5';
+            case 20:
+                return 'RP5';
+        }
+    } else {
+        return "done";
+    }
+}
 
 function preloadChampionImages() {
     Object.keys(champions).forEach(championKey => {
         const champion = champions[championKey];
         const championImage = new Image();
+        const championIcon = new Image();
         if(champion.id === 'Fiddlesticks') { //LOL!
             championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/FiddleSticks_0.jpg`;
+            championIcon.src = `${baseUrl}/img/champion/Fiddlesticks.png`;
         } else {
             championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/${champion.id}_0.jpg`;
+            championIcon.src = `${baseUrl}/img/champion/${champion.id}.png`;
         }
         preloadedImages[champion.id] = championImage;
+        preloadedIcons[champion.id] = championIcon;
     });
     updateFearlessBanSlots();
 }
@@ -67,22 +109,38 @@ function displayChampions(champions) {
 	Object.keys(champions).forEach(championKey => {
 		const champion = champions[championKey];
 		const championIcon = document.createElement('img');
-		championIcon.src = `${baseUrl}/img/champion/${champion.id}.png`;
+        championIcon.src = preloadedIcons[champion.id].src;
 		championIcon.alt = champion.id;
 		championIcon.classList.add('champion-icon');
-		championIcon.addEventListener('click', () => {
-            const pickSlot = document.querySelector(`#blue-picks .pick-slot:nth-child(${currentPick})`);
-            const pickImage = pickSlot.querySelector('img');
-			if (selectedChampion === championIcon) {
-                pickImage.src = '/img/placeholder.png';
-                selectedChampion = null;
-                confirmButton.disabled = true;
-			} else {
-                pickImage.src = preloadedImages[champion.id].src;
+        if(usedChamps.has(champion.id)){
+            championIcon.classList.add('used');
+            //grey out the icon
+            championIcon.style.filter = 'grayscale(100%)';
+        } else {
+            championIcon.addEventListener('click', () => {
+                const currSlot = getCurrSlot();
+                if(currSlot === "done"){
+                    return;
+                }
+                if(currSlot[1] === 'B'){ //ban
+                    let banSlot = document.querySelector(`#blue-bans .ban-slot:nth-child(${currSlot[2]})`);
+                    if(currSlot[0] === 'R'){ //red side ban
+                        banSlot = document.querySelector(`#red-bans .ban-slot:nth-child(${6-currSlot[2]})`);
+                    }
+                    const banImage = banSlot.querySelector('img');
+                    banImage.src = preloadedIcons[champion.id].src;
+                } else { //pick
+                    let pickSlot = document.querySelector(`#blue-picks .pick-slot:nth-child(${currSlot[2]})`);
+                    if(currSlot[0] === 'R'){ //red side ban
+                        pickSlot = document.querySelector(`#red-picks .pick-slot:nth-child(${currSlot[2]})`);
+                    }
+                    const pickImage = pickSlot.querySelector('img');
+                    pickImage.src = preloadedImages[champion.id].src;
+                }
                 selectedChampion = championIcon;
                 confirmButton.disabled = false;
-            }
-		});
+            });
+        }
 		championGrid.appendChild(championIcon);
 	});
 }
@@ -121,14 +179,14 @@ searchInput.addEventListener('input', filterChampions);
 
 const confirmButton = document.getElementById('confirmButton');
 confirmButton.addEventListener('click', () => {
-	if (selectedChampion) {
-		const championName = selectedChampion.alt;
-        const champion = Object.values(champions).find(champ => champ.id === championName);
-        handleDraftSelection(champion);
-		selectedChampion.classList.remove('selected');
-		selectedChampion = null;
-		confirmButton.disabled = true;
-	}
+    if (selectedChampion) {
+        const championName = selectedChampion.alt;
+        selectedChampion = null;
+        confirmButton.disabled = true;
+        usedChamps.add(championName);
+        currPick++;
+        filterChampions();
+    }
 });
 
 
@@ -176,17 +234,6 @@ function updateFearlessBanSlots() {
     blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
     redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
-
-function handleDraftSelection(champion) {
-	socket.emit('draftSelection', champion);
-    const pickSlot = document.querySelector(`#blue-picks .pick-slot:nth-child(${currentPick})`);
-    const championImage = document.createElement('img');
-    championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/${champion.id}_0.jpg`;
-    pickSlot.innerHTML = '';
-    pickSlot.appendChild(championImage);
-    currentPick++;
-}
-
 
 socket.on('draftUpdate', (data) => {
 	console.log('Draft update:', data);

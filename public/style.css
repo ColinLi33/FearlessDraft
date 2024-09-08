@@ -1,12 +1,12 @@
-.draft-container {
+body {
+    background-color: #303030;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .draft-container {
     display: flex;
     justify-content: space-between;
     margin: 20px;
-  }
-  
-  .blue-side,
-  .red-side {
-    width: 200px;
   }
   
   .champion-pool-container {
@@ -15,7 +15,50 @@
     display: flex;
     flex-direction: column;
   }
-
+  
+  .champion-pool-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 0 5px;
+  }
+  
+  .blue-side-header {
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    height: 40px;
+    width: 240px;
+    color: #ffffff;
+    background-color: #3537ae;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .red-side-header {
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    height: 40px;
+    width: 240px;
+    color: #ffffff;
+    background-color: #b70b0b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
   .role-filter {
     display: flex;
     align-items: center;
@@ -32,27 +75,31 @@
   .role-icon.active {
     opacity: 1;
   }
-
+  
   .search-bar {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 10px;
+    padding: 0 5px;
   }
-
+  
   .search-bar input {
-    padding: 5px;
-    font-size: 14px;
+    padding: 3px;
+    font-size: 18px;
+    color: #747474;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: black;
   }
-
+  
   .champion-pool {
-    max-height: 400px; /* Adjust the height as needed */
+    flex-grow: 1;
+    max-height: 425px;
     overflow-y: auto;
     border: 0px solid #515151;
     padding: 5px;
-  }
 
+  }
+  
   .champion-icon {
     width: 75px;
     height: 75px;
@@ -67,23 +114,67 @@
     justify-items: center;
   }
   
-  #blue-picks,
-  #red-picks {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 10px;
-    justify-items: center;
+  .blue-side,
+  .red-side {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-
-  .champion-icon.selected {
-    border: 2px solid blue;
+  
+  #blue-bans {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 3px;
+    margin-left: 35px;
+  }
+  
+  #red-bans {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 3px;
+    margin-right: 19px;
+  }
+  
+  .pick-slot {
+    width: 240px;
+    height: 83px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin-bottom: 5px;
+    overflow: hidden;
+  }
+  
+  .ban-slot {
+    width: 45px;
+    height: 45px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin-right: 10px;
+    overflow: hidden;
+  }
+  
+  .pick-slot img,
+  .ban-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
   }
   
   #confirmButton {
     display: block;
-    margin: 10px auto;
+    margin: 10px auto 0;
     padding: 10px 20px;
     font-size: 16px;
+    background-color: rgb(236, 209, 59);
+    border: 0;
   }
   
   #confirmButton:disabled {

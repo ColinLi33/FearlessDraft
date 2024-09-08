@@ -7,6 +7,35 @@ let matchNumber = 3;
 const preloadedImages = {};
 const preloadedIcons = {};
 let usedChamps = new Set();
+let timerInterval = null;
+let timeLeft = 30;
+
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft >= -3) {
+            const timerElement = document.getElementById('timer');
+            timerElement.style.color = 'white';
+            timerElement.textContent = timeLeft >= 0 ? timeLeft : 0;
+        } else {
+            clearInterval(timerInterval);
+            lockChamp();
+        }
+    }, 1000);
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 30;
+    const timerElement = document.getElementById('timer');
+    timerElement.textContent = timeLeft;
+}
+
+function startPickOrBanPhase() {
+    resetTimer();
+    startTimer();
+}
 
 function getCurrSlot(){
     if(currPick <= 6){
@@ -78,6 +107,8 @@ fetch(`${baseUrl}/data/en_US/champion.json`)
 		roleData = data;
 		mergeRoleData(roleData.data);
 		displayChampions(champions);
+        colorBorder();
+        startPickOrBanPhase();
 	})
 	.catch(error => {
 		console.error('Error fetching data:', error);
@@ -179,15 +210,35 @@ searchInput.addEventListener('input', filterChampions);
 
 const confirmButton = document.getElementById('confirmButton');
 confirmButton.addEventListener('click', () => {
+    lockChamp();
+});
+
+
+function colorBorder(){
+    let currSlot = getCurrSlot();
+    if(currSlot === "done"){
+        return;
+    }
+    if(currSlot[0] === 'B'){ //make border of blue-side-header gold
+        document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
+        document.querySelector('#red-side-header').style.border = '2px solid black';
+    } else {
+        document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
+        document.querySelector('#blue-side-header').style.border = '2px solid black';
+    }
+}
+function lockChamp(){
     if (selectedChampion) {
         const championName = selectedChampion.alt;
         selectedChampion = null;
         confirmButton.disabled = true;
         usedChamps.add(championName);
-        currPick++;
-        filterChampions();
     }
-});
+    currPick++;
+    colorBorder();
+    filterChampions();
+    startPickOrBanPhase();
+}
 
 
 function updateFearlessBanSlots() {

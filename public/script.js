@@ -3,7 +3,7 @@ const patch = '14.17.1'
 const baseUrl = `http://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
 let currentPick = 1;
-let matchNumber = 2;
+let matchNumber = 3;
 const preloadedImages = {};
 
 function preloadChampionImages() {
@@ -151,8 +151,8 @@ function updateFearlessBanSlots() {
             break;
         case 3:
             fearlessBansPerSide = 10;
-            leftMargin = -90;
-            rightMargin = -96;
+            leftMargin = 60;
+            rightMargin = 54;
             break;
         case 4:
             fearlessBansPerSide = 15;

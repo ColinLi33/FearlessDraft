@@ -3,7 +3,7 @@ const patch = '14.17.1'
 const baseUrl = `http://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
 let currPick = 1;
-let matchNumber = 3;
+let matchNumber = 1;
 const preloadedImages = {};
 const preloadedIcons = {};
 let usedChamps = new Set();
@@ -286,6 +286,23 @@ function updateFearlessBanSlots() {
     redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
 
-socket.on('draftUpdate', (data) => {
-	console.log('Draft update:', data);
-});
+function handleSocketEvents() {
+    socket.on('draftUpdate', (data) => {
+        console.log('Draft update:', data);
+        currPick = data.currPick;
+        usedChamps = new Set(data.usedChamps);
+        timeLeft = data.timeLeft;
+        matchNumber = data.matchNumber;
+        filterChampions();
+        colorBorder();
+        updateTimer();
+        updateFearlessBanSlots();
+    });
+}
+socket.on('connect', handleSocketEvents);
+function startTimer() {
+    socket.emit('startTimer');
+}
+function resetTimer() {
+    socket.emit('resetTimer');
+}

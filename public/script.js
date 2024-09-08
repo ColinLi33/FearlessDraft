@@ -2,7 +2,8 @@ const socket = io();
 const patch = '14.17.1'
 const baseUrl = `http://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
-let currentPick = 1
+let currentPick = 1;
+let matchNumber = 2;
 const preloadedImages = {};
 
 function preloadChampionImages() {
@@ -16,6 +17,7 @@ function preloadChampionImages() {
         }
         preloadedImages[champion.id] = championImage;
     });
+    updateFearlessBanSlots();
 }
 
 fetch(`${baseUrl}/data/en_US/champion.json`)
@@ -128,6 +130,52 @@ confirmButton.addEventListener('click', () => {
 		confirmButton.disabled = true;
 	}
 });
+
+
+function updateFearlessBanSlots() {
+    const blueFearlessBanSlots = document.querySelectorAll('#blue-fearless-bans .fearless-ban-slot');
+    const redFearlessBanSlots = document.querySelectorAll('#red-fearless-bans .fearless-ban-slot');
+    const blueFearlessBansDiv = document.querySelector('#blue-fearless-bans');
+    const redFearlessBansDiv = document.querySelector('#red-fearless-bans');
+
+    switch(matchNumber) {
+        case 1:
+            fearlessBansPerSide = 0;
+            leftMargin = 0;
+            rightMargin = 0;
+            break;
+        case 2:
+            fearlessBansPerSide = 5;
+            leftMargin = -90;
+            rightMargin = -96;
+            break;
+        case 3:
+            fearlessBansPerSide = 10;
+            leftMargin = -90;
+            rightMargin = -96;
+            break;
+        case 4:
+            fearlessBansPerSide = 15;
+            leftMargin = 210;
+            rightMargin = 204;
+            break;
+        case 5:
+            fearlessBansPerSide = 0;
+            break;
+        default:
+            fearlessBansPerSide = 0;
+            break;
+    }
+    blueFearlessBanSlots.forEach((slot, index) => {
+        slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
+    });
+
+    redFearlessBanSlots.forEach((slot, index) => {
+        slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
+    });
+    blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
+    redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
+}
 
 function handleDraftSelection(champion) {
 	socket.emit('draftSelection', champion);

@@ -7,7 +7,7 @@ const uuid = require('uuid');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-const domain = 'localhost:3333';
+const domain = 'https://fearless-draft-170331cbcc78.herokuapp.com';
 
 const currStates = {};
 

@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const domain = 'https://www.fearlessdraft.net';
+// const domain = 'http://localhost:3333';
 
 const currStates = {};
 
@@ -64,7 +65,8 @@ app.post('/create-draft', (req, res) => {
         fearlessBans: [],
         timer: null,
         started: false,
-        matchNumber: 1
+        matchNumber: 1,
+        sideSwapped: false
     };
     res.json({
         blueLink,
@@ -96,7 +98,10 @@ io.on('connection', (socket) => {
                 fearlessBans: [],
                 timer: null,
                 started: false,
-                matchNumber: 1
+                matchNumber: 1,
+                sideSwapped: false,
+                blueTeamName: 'Blue',
+                redTeamName: 'Red'
 
             };
         }
@@ -136,6 +141,10 @@ io.on('connection', (socket) => {
             clearInterval(currStates[draftId].timer);
             currStates[draftId].timer = null;
         }
+        io.to(draftId).emit('showNextGameButton');
+    });
+
+    socket.on('startNewDraft', (draftId) => {
         if (!currStates[draftId].fearlessBans) {
             currStates[draftId].fearlessBans = []
         }
@@ -157,7 +166,10 @@ io.on('connection', (socket) => {
                 fearlessBans: [],
                 timer: null,
                 started: false,
-                matchNumber: 1
+                matchNumber: 1,
+                sideSwapped: false,
+                blueTeamName: 'Blue',
+                redTeamName: 'Red'
             });
             return;
         }
@@ -168,7 +180,10 @@ io.on('connection', (socket) => {
             picks: currStates[draftId].picks,
             started: currStates[draftId].started,
             fearlessBans: currStates[draftId].fearlessBans,
-            matchNumber: currStates[draftId].matchNumber
+            matchNumber: currStates[draftId].matchNumber,
+            sideSwapped: currStates[draftId].sideSwapped,
+            blueTeamName: currStates[draftId].blueTeamName,
+            redTeamName: currStates[draftId].redTeamName
         };
         socket.emit('draftState', data);
     });
@@ -181,6 +196,20 @@ io.on('connection', (socket) => {
         if (currStates[draftId]) {
             currStates[draftId].picks.push(pick);
             io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
+        }
+    });
+
+    socket.on('switchSides', (draftId) => {
+        if (currStates[draftId]) {
+            currStates[draftId].sideSwapped = !currStates[draftId].sideSwapped;
+            if(currStates[draftId].blueTeamName === 'Blue' || currStates[draftId].redTeamName === 'Red') {
+                io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
+                return;
+            }
+            const temp = currStates[draftId].blueTeamName;
+            currStates[draftId].blueTeamName = currStates[draftId].redTeamName;
+            currStates[draftId].redTeamName = temp;
+            io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
         }
     });
 });

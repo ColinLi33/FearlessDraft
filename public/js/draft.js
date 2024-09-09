@@ -196,6 +196,12 @@ searchInput.addEventListener('input', filterChampions);
 const confirmButton = document.getElementById('confirmButton');
 confirmButton.addEventListener('click', () => {
     if (currPick === 0) {
+        if(side === 'S'){
+            return
+        }
+        if(draftStarted){
+            socket.emit('startNewDraft', draftId);
+        }
         if (side === 'B') {
             blueReady = true;
             confirmButton.textContent = 'Waiting for Red...';
@@ -317,6 +323,8 @@ function startDraft() {
     document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
     confirmButton.textContent = 'Lock In';
     confirmButton.disabled = false;
+    const switchSidesButton = document.getElementById('switchSidesButton');
+    switchSidesButton.style.display = 'none';
     filterChampions();
     colorBorder();
     startTimer();
@@ -390,6 +398,34 @@ function endDraft() {
     socket.emit("endDraft", draftId);
 }
 
+function updateSide(sideSwapped, blueName, redName, initialLoad=false) {
+    if (sideSelect === 'blue') {
+        side = 'B'
+    } else if (sideSelect === 'red') {
+        side = 'R'
+    } else if (sideSelect === 'spectator') {
+        side = 'S'
+    }
+    document.getElementById('blue-team-name').textContent = blueName;
+    document.getElementById('red-team-name').textContent = redName;
+    if(!sideSwapped){
+        if(!initialLoad)
+            alert(`You are now on ${side}`);
+        return
+    }
+    if (side === 'B') {
+        side = 'R';
+        if(!initialLoad)
+            alert(`You are now on ${side}`);
+    } else if (side === 'R') {
+        side = 'B';
+        if(!initialLoad)
+            alert(`You are now on ${side}`);
+    }
+    document.getElementById('blue-team-name').textContent = blueName;
+    document.getElementById('red-team-name').textContent = redName;
+}
+
 socket.on('playerReady', (data) => {
     blueReady = data.blueReady;
     redReady = data.redReady;
@@ -397,6 +433,17 @@ socket.on('playerReady', (data) => {
     if (!draftStarted && blueReady && redReady) {
         startDraft();
     }
+});
+
+socket.on('showNextGameButton', () => {
+    currPick = 0
+    confirmButton.textContent = 'Ready Next Game';
+    confirmButton.disabled = false;
+    const switchSidesButton = document.getElementById('switchSidesButton');
+    switchSidesButton.style.display = 'block';
+    switchSidesButton.onclick = function() {
+        socket.emit('switchSides', draftId);
+    };
 });
 
 socket.on('draftEnded', (data) => {
@@ -408,8 +455,6 @@ socket.on('draftEnded', (data) => {
     matchNumber = data.matchNumber;
     picks = data.picks;
     usedChamps = new Set();
-    confirmButton.textContent = 'Ready Next Game';
-    confirmButton.disabled = false;
     updateFearlessBanSlots();
     fearlessBan(data.fearlessBans);
 });
@@ -421,10 +466,20 @@ socket.on('draftState', (data) => {
     picks = data.picks;
     fearlessChamps = new Set(data.fearlessBans);
     matchNumber = data.matchNumber;
+    sideSwapped = data.sideSwapped;
+    updateSide(sideSwapped, data.blueTeamName, data.redTeamName, true);
+    updateFearlessBanSlots();
+    fearlessBan(data.fearlessBans);
     if (draftStarted) {
         newPick(picks);
-        updateFearlessBanSlots();
-        fearlessBan(data.fearlessBans);
+        if(picks.length===20){
+            currPick = 0;
+            const switchSidesButton = document.getElementById('switchSidesButton');
+            switchSidesButton.style.display = 'block';
+            switchSidesButton.onclick = function() {
+                socket.emit('switchSides', draftId);
+            };
+        }
         return;
     }
     if (blueReady && redReady) {
@@ -456,6 +511,10 @@ socket.on('pickUpdate', (picks) => {
     newPick(picks);
 });
 
+socket.on('switchSidesResponse', (data) => {
+    updateSide(data.sideSwapped, data.blueTeamName, data.redTeamName);
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadChamps();
     preloadChampionImages();
@@ -463,11 +522,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     socket.emit('joinDraft', draftId);
     socket.emit('getData', draftId);
     updateFearlessBanSlots();
-    if (sideSelect === 'blue') {
-        side = 'B'
-    } else if (sideSelect === 'red') {
-        side = 'R'
-    } else if (sideSelect === 'spectator') {
-        side = 'S'
-    }
 });

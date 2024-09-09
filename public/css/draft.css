@@ -215,6 +215,15 @@ body {
     border: 0;
 }
 
+#switchSidesButton {
+    display: block;
+    margin: 10px auto 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: rgb(236, 209, 59);
+    border: 0;
+}
+
 #confirmButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;

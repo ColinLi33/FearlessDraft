@@ -16,15 +16,13 @@
     <script>
         const draftId = '<%= draftId %>';
         const sideSelect = '<%= side %>';
-        // const blueTeamName = '<%= blueTeamName %>';
-        // const redTeamName = '<%= redTeamName %>';
     </script>
 </head>
 <body>
     <div class="draft-container">
         <div class="blue-side">
             <div id="blue-side-header" class="blue-side-header">
-                <h2><%= blueTeamName %> </h2>
+                <h2 id="blue-team-name"><%= blueTeamName %> </h2>
             </div>
             <div id="blue-picks">
                 <div class="pick-slot">
@@ -129,12 +127,13 @@
                 </div>
                 <div class="button-container">
                     <button id="confirmButton" enabled>Ready</button>
+                    <button id="switchSidesButton" style="display: none;">Switch Sides?</button>
                 </div>
             </div>
         </div>
         <div class="red-side">
             <div id="red-side-header" class="red-side-header">
-                <h2><%= redTeamName %> </h2>
+                <h2 id="red-team-name"><%= redTeamName %> </h2>
             </div>
             <div id="red-picks">
                 <div class="pick-slot">

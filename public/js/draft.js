@@ -2,39 +2,19 @@ const socket = io();
 const patch = '14.17.1'
 const baseUrl = `http://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
-let currPick = 1;
+let currPick = 0;
 let matchNumber = 1;
 const preloadedImages = {};
 const preloadedIcons = {};
 let usedChamps = new Set();
 let timerInterval = null;
 let timeLeft = 30;
-
+let side = null
+let blueReady = false;
+let redReady = false;
 
 function startTimer() {
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft >= -3) {
-            const timerElement = document.getElementById('timer');
-            timerElement.style.color = 'white';
-            timerElement.textContent = timeLeft >= 0 ? timeLeft : 0;
-        } else {
-            clearInterval(timerInterval);
-            lockChamp();
-        }
-    }, 1000);
-}
-
-function resetTimer() {
-    clearInterval(timerInterval);
-    timeLeft = 30;
-    const timerElement = document.getElementById('timer');
-    timerElement.textContent = timeLeft;
-}
-
-function startPickOrBanPhase() {
-    resetTimer();
-    startTimer();
+    socket.emit('startTimer', { draftId });
 }
 
 function getCurrSlot(){
@@ -73,6 +53,31 @@ function getCurrSlot(){
     }
 }
 
+async function loadChamps(){
+    return new Promise((resolve, reject) => {
+        fetch(`${baseUrl}/data/en_US/champion.json`)
+          .then(response => response.json())
+          .then(data => {
+            champions = data.data;
+            champions = Object.entries(champions).map(([key, value]) => ({
+              id: value.id,
+              key: value.key,
+            }));
+            return fetch('/proxy/championrates');
+          })
+          .then(response => response.json())
+          .then(data => {
+            roleData = data;
+            mergeRoleData(roleData.data);
+            resolve();
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+            reject(error);
+        });
+    });
+}
+
 function preloadChampionImages() {
     Object.keys(champions).forEach(championKey => {
         const champion = champions[championKey];
@@ -88,31 +93,7 @@ function preloadChampionImages() {
         preloadedImages[champion.id] = championImage;
         preloadedIcons[champion.id] = championIcon;
     });
-    updateFearlessBanSlots();
 }
-
-fetch(`${baseUrl}/data/en_US/champion.json`)
-	.then(response => response.json())
-	.then(data => {
-		champions = data.data;
-        champions = Object.entries(champions).map(([key, value]) => ({
-            id: value.id,
-            key: value.key,
-        }));
-        preloadChampionImages();
-		return fetch('/proxy/championrates');
-	})
-	.then(response => response.json())
-	.then(data => {
-		roleData = data;
-		mergeRoleData(roleData.data);
-		displayChampions(champions);
-        colorBorder();
-        startPickOrBanPhase();
-	})
-	.catch(error => {
-		console.error('Error fetching data:', error);
-	});
 
 function mergeRoleData(roleData) {
 	Object.keys(champions).forEach(champ => {
@@ -145,12 +126,14 @@ function displayChampions(champions) {
 		championIcon.classList.add('champion-icon');
         if(usedChamps.has(champion.id)){
             championIcon.classList.add('used');
-            //grey out the icon
             championIcon.style.filter = 'grayscale(100%)';
         } else {
             championIcon.addEventListener('click', () => {
                 const currSlot = getCurrSlot();
                 if(currSlot === "done"){
+                    return;
+                }
+                if(currSlot[0] != side){
                     return;
                 }
                 if(currSlot[1] === 'B'){ //ban
@@ -175,7 +158,6 @@ function displayChampions(champions) {
 		championGrid.appendChild(championIcon);
 	});
 }
-
 
 function filterChampions() {
 	const searchTerm = searchInput.value.toLowerCase();
@@ -210,9 +192,22 @@ searchInput.addEventListener('input', filterChampions);
 
 const confirmButton = document.getElementById('confirmButton');
 confirmButton.addEventListener('click', () => {
-    lockChamp();
+    if (currPick === 0) {
+        if (side === 'B') {
+            blueReady = true;
+            confirmButton.textContent = 'Waiting for Red...';
+            confirmButton.disabled = true;
+            socket.emit('playerReady', { draftId, side: 'blue' });
+        } else if (side === 'R') {
+            redReady = true;
+            confirmButton.textContent = 'Waiting for Blue...';
+            confirmButton.disabled = true;
+            socket.emit('playerReady', { draftId, side: 'red' });
+        }
+    } else {
+        lockChamp();
+    }
 });
-
 
 function colorBorder(){
     let currSlot = getCurrSlot();
@@ -227,18 +222,6 @@ function colorBorder(){
         document.querySelector('#blue-side-header').style.border = '2px solid black';
     }
 }
-function lockChamp(){
-    if (selectedChampion) {
-        const championName = selectedChampion.alt;
-        selectedChampion = null;
-        confirmButton.disabled = true;
-        usedChamps.add(championName);
-    }
-    currPick++;
-    colorBorder();
-    filterChampions();
-    startPickOrBanPhase();
-}
 
 
 function updateFearlessBanSlots() {
@@ -246,7 +229,7 @@ function updateFearlessBanSlots() {
     const redFearlessBanSlots = document.querySelectorAll('#red-fearless-bans .fearless-ban-slot');
     const blueFearlessBansDiv = document.querySelector('#blue-fearless-bans');
     const redFearlessBansDiv = document.querySelector('#red-fearless-bans');
-
+    
     switch(matchNumber) {
         case 1:
             fearlessBansPerSide = 0;
@@ -278,10 +261,127 @@ function updateFearlessBanSlots() {
     blueFearlessBanSlots.forEach((slot, index) => {
         slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
     });
-
+    
     redFearlessBanSlots.forEach((slot, index) => {
         slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
     });
     blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
     redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
+            
+function lockChamp(){
+    const currSlot = getCurrSlot();
+    if(currSlot[0] != side){
+        return;
+    }
+    if (selectedChampion) {
+        const championName = selectedChampion.alt;
+        selectedChampion = null;
+        confirmButton.disabled = true;
+        usedChamps.add(championName);
+        socket.emit('pickSelection', {draftId, pick: championName});
+    } else {
+        socket.emit('pickSelection', {draftId, pick: "placeholder"});
+    }
+    currPick++;
+    if(currPick <= 20){
+        colorBorder();
+        filterChampions();
+        startTimer();
+    } else {
+        confirmButton.textContent = 'Ready Next Game';
+        confirmButton.disabled = false
+    }
+}
+
+function startDraft() {
+    currPick = 1;
+    confirmButton.textContent = 'Lock In';
+    confirmButton.disabled = false;
+    colorBorder();
+    startTimer();
+}
+
+function newPick(picks){
+    picks.forEach((pick, index) => {
+        if(pick == 'placeholder'){
+            currPick++;
+            colorBorder();
+            return;
+        }
+        currPick = index+1;
+        const slot = getCurrSlot(currPick);
+        if (slot[1] === 'B') {
+            const banSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-bans .ban-slot:nth-child(${slot[0] === 'B' ? slot[2] : 6-slot[2]})`);
+            const banImage = banSlot.querySelector('img');
+            banImage.src = preloadedIcons[pick].src;
+        } else {
+            const pickSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-picks .pick-slot:nth-child(${slot[2]})`);
+            const pickImage = pickSlot.querySelector('img');
+            pickImage.src = preloadedImages[pick].src;
+        }
+        usedChamps.add(pick);
+        currPick++;
+    });
+    colorBorder();
+    displayChampions(champions);
+}
+
+socket.on('playerReady', (data) => {
+    blueReady = data.blueReady;
+    redReady = data.redReady;
+    draftStarted = data.started;
+    if (!draftStarted && blueReady && redReady) {
+        startDraft();
+    }
+});
+
+socket.on('draftState', (data) => {;
+    blueReady = data.blueReady;
+    redReady = data.redReady;
+    draftStarted = data.started;
+    picks = data.picks;
+    if(draftStarted){
+        newPick(picks);
+        return;
+    }
+    if (blueReady && redReady) {
+        startDraft();
+    } else if (blueReady && side === 'B') {
+        confirmButton.textContent = 'Waiting for Red...';
+        confirmButton.disabled = true;
+    } else if (redReady && side === 'R') {
+        confirmButton.textContent = 'Waiting for Blue...';
+        confirmButton.disabled = true;
+    }
+});
+
+socket.on('timerUpdate', (data) => {
+    const { timeLeft } = data;
+    const timerElement = document.getElementById('timer');
+    timerElement.textContent = timeLeft >= 0 ? timeLeft : 0;
+});
+
+socket.on('lockChamp', () => {
+    lockChamp();
+});
+
+socket.on('pickUpdate', (picks) => {
+    newPick(picks);
+});
+
+document.addEventListener('DOMContentLoaded', async() => {
+    await loadChamps();
+    preloadChampionImages();
+    displayChampions(champions);
+    socket.emit('joinDraft', draftId);
+    socket.emit('getData', draftId);
+    updateFearlessBanSlots();
+    if (sideSelect === 'blue') {
+        side = 'B'
+    } else if (sideSelect === 'red') {
+        side = 'R'
+    } else if (sideSelect === 'spectator') {
+        side = 'S'
+    }
+});

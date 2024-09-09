@@ -8,7 +8,15 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const domain = 'localhost:3333';
+
+const currStates = {};
+
+app.set('view engine', 'ejs');
 app.use(express.static('public'));
+
+app.get('/', (req, res) => {   
+    res.render('index');
+});
 
 app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
 	try {
@@ -23,34 +31,93 @@ app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
 	}
 });
 
+app.get('/draft/:draftId/:side', (req, res) => {
+    const draftId = req.params.draftId;
+    const side = req.params.side;
+    
+    // Pass the draftId and side to the draft page
+    res.render('draft', { draftId, side });
+});
+
 
 app.post('/create-draft', (req, res) => {
     const draftId = uuid.v4();
     const blueLink = `${domain}/draft/${draftId}/blue`;
     const redLink = `${domain}/draft/${draftId}/red`;
     const spectatorLink = `${domain}/draft/${draftId}/spectator`;
+    currStates[draftId] = {
+        blueReady: false,
+        redReady: false,
+        picks: [],
+        timer: null,
+        started: false
+    };
     res.json({ blueLink, redLink, spectatorLink });
 });
+
   
   io.on('connection', (socket) => {
-    console.log('A user connected');
-  
-    // Join a draft room based on the URL
-    socket.on('joinDraft', (data) => {
-      const { draftId, side } = data;
-      socket.join(draftId);
-      console.log(`User joined draft ${draftId} on ${side} side`);
-      socket.to(draftId).emit('userJoined', { side });
+    socket.on('joinDraft', (draftId) => {
+        try {
+            socket.join(draftId);
+        } catch (error) {
+            console.error('Error joining draft:', error);
+        }
     });
   
-    // Handle draft selection within a draft room
-    socket.on('draftSelection', (data) => {
-      console.log('Draft selection:', data);
-      io.to(data.draftId).emit('draftUpdate', data);
+    socket.on('playerReady', (data) => {
+        const { draftId, side } = data;
+        if (!currStates[draftId]) {
+            currStates[draftId] = {
+                blueReady: false,
+                redReady: false,
+                picks: [],
+                timer: null,
+                started: false
+            };
+        }
+        if (side === 'blue') {
+            currStates[draftId].blueReady = true;
+        } else if (side === 'red') {
+            currStates[draftId].redReady = true;
+        }
+        io.to(draftId).emit('playerReady', currStates[draftId]);
+    });
+
+    socket.on('startTimer', (data) => {
+        const { draftId } = data;
+        currStates[draftId].started = true;
+        if(currStates[draftId].timer){
+            clearInterval(currStates[draftId].timer);
+            currStates[draftId].timer = null
+        }
+        let timeLeft = 30;
+        currStates[draftId].timer = setInterval(() => {
+            timeLeft--;
+            io.to(draftId).emit('timerUpdate', { timeLeft });
+            if (timeLeft <= -3) {
+                clearInterval(currStates[draftId].timer);
+                currStates[draftId].timer = null;
+                io.to(draftId).emit('lockChamp');
+            }
+        }, 1000);
     });
   
-    socket.on('disconnect', () => {
-      console.log('A user disconnected');
+    socket.on('getData', (draftId) => {
+        if(!currStates[draftId]){
+            socket.emit('draftState', { blueReady: false, redReady: false, picks: [], started: false });
+            return;
+        }
+        data = { blueReady: currStates[draftId].blueReady, redReady: currStates[draftId].redReady, picks: currStates[draftId].picks, started: currStates[draftId].started };
+        socket.emit('draftState', data);
+    });
+  
+    socket.on('pickSelection', (data) => {
+        const { draftId, pick } = data;
+        if (currStates[draftId]) {
+            currStates[draftId].picks.push(pick);
+            io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
+        }
     });
   });
 

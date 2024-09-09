@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <head>
-    <link rel="stylesheet" href="draft.css">
+    <link rel="stylesheet" href="/css/draft.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // const socket = io();
+        const draftId = '<%= draftId %>';
+        const sideSelect = '<%= side %>';
+    </script>
 </head>
 <body>
     <div class="draft-container">
@@ -94,11 +100,11 @@
         <div class="champion-pool-container">
             <div class="filter-container">
                 <div class="role-filter">
-                    <img src="img/top_icon.png" alt="Top" data-role="top" class="role-icon">
-                    <img src="img/jg_icon.png" alt="Jungle" data-role="jungle" class="role-icon">
-                    <img src="img/mid_icon.png" alt="Mid" data-role="middle" class="role-icon">
-                    <img src="img/bot_icon.png" alt="Bot" data-role="bottom" class="role-icon">
-                    <img src="img/supp_icon.png" alt="Support" data-role="utility" class="role-icon">
+                    <img src="/img/top_icon.png" alt="Top" data-role="top" class="role-icon">
+                    <img src="/img/jg_icon.png" alt="Jungle" data-role="jungle" class="role-icon">
+                    <img src="/img/mid_icon.png" alt="Mid" data-role="middle" class="role-icon">
+                    <img src="/img/bot_icon.png" alt="Bot" data-role="bottom" class="role-icon">
+                    <img src="/img/supp_icon.png" alt="Support" data-role="utility" class="role-icon">
                 </div>
                     <div id="timer">30</div>
                 <div class="search-bar">
@@ -110,7 +116,7 @@
                     <div id="champion-grid"></div>
                 </div>
                 <div class="button-container">
-                    <button id="confirmButton" disabled>Lock In</button>
+                    <button id="confirmButton" enabled>Ready</button>
                 </div>
             </div>
         </div>
@@ -202,7 +208,6 @@
             </div>
         </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="draft.js"></script>
+    <script src="/js/draft.js"></script>
 </body>
 </html>

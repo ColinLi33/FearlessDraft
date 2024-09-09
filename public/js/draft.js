@@ -15,14 +15,16 @@ let blueReady = false;
 let redReady = false;
 
 function startTimer() {
-    socket.emit('startTimer', { draftId });
+    socket.emit('startTimer', {
+        draftId
+    });
 }
 
-function getCurrSlot(){
-    if(currPick <= 6){
+function getCurrSlot() {
+    if (currPick <= 6) {
         return currPick % 2 === 1 ? `BB${Math.ceil(currPick/2)}` : `RB${Math.ceil(currPick/2)}`;
-    } else if(currPick <= 12){
-        switch(currPick){
+    } else if (currPick <= 12) {
+        switch (currPick) {
             case 7:
                 return 'BP1';
             case 8:
@@ -36,10 +38,10 @@ function getCurrSlot(){
             case 12:
                 return 'RP3';
         }
-    } else if(currPick <= 16){
+    } else if (currPick <= 16) {
         return currPick % 2 === 0 ? `BB${Math.ceil(currPick/2)-3}` : `RB${Math.ceil(currPick/2)-3}`;
-    } else if(currPick <= 20) {
-        switch(currPick){
+    } else if (currPick <= 20) {
+        switch (currPick) {
             case 17:
                 return 'RP4';
             case 18:
@@ -54,28 +56,28 @@ function getCurrSlot(){
     }
 }
 
-async function loadChamps(){
+async function loadChamps() {
     return new Promise((resolve, reject) => {
         fetch(`${baseUrl}/data/en_US/champion.json`)
-          .then(response => response.json())
-          .then(data => {
-            champions = data.data;
-            champions = Object.entries(champions).map(([key, value]) => ({
-              id: value.id,
-              key: value.key,
-            }));
-            return fetch('/proxy/championrates');
-          })
-          .then(response => response.json())
-          .then(data => {
-            roleData = data;
-            mergeRoleData(roleData.data);
-            resolve();
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-            reject(error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                champions = data.data;
+                champions = Object.entries(champions).map(([key, value]) => ({
+                    id: value.id,
+                    key: value.key,
+                }));
+                return fetch('/proxy/championrates');
+            })
+            .then(response => response.json())
+            .then(data => {
+                roleData = data;
+                mergeRoleData(roleData.data);
+                resolve();
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                reject(error);
+            });
     });
 }
 
@@ -84,7 +86,7 @@ function preloadChampionImages() {
         const champion = champions[championKey];
         const championImage = new Image();
         const championIcon = new Image();
-        if(champion.id === 'Fiddlesticks') { //LOL!
+        if (champion.id === 'Fiddlesticks') { //LOL!
             championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/FiddleSticks_0.jpg`;
             championIcon.src = `${baseUrl}/img/champion/Fiddlesticks.png`;
         } else {
@@ -97,56 +99,56 @@ function preloadChampionImages() {
 }
 
 function mergeRoleData(roleData) {
-	Object.keys(champions).forEach(champ => {
-		const key = champions[champ].key.toString();
-		if (roleData[key]) {
-			const roles = roleData[key];
-			roleTest = Object.entries(roles).map(([role, data]) => ({
-				role: role,
-				playRate: data.playRate
-			}))
-			roleTest = roleTest.filter(role => role.playRate > 0);
-			roleTest = roleTest.map(role => role.role);
-			champions[champ].roles = roleTest;
-		} else {
-			champ.roles = [];
-		}
-	});
+    Object.keys(champions).forEach(champ => {
+        const key = champions[champ].key.toString();
+        if (roleData[key]) {
+            const roles = roleData[key];
+            roleTest = Object.entries(roles).map(([role, data]) => ({
+                role: role,
+                playRate: data.playRate
+            }))
+            roleTest = roleTest.filter(role => role.playRate > 0);
+            roleTest = roleTest.map(role => role.role);
+            champions[champ].roles = roleTest;
+        } else {
+            champ.roles = [];
+        }
+    });
 }
 
 const championGrid = document.getElementById('champion-grid');
 let selectedChampion = null;
 
 function displayChampions(champions) {
-	championGrid.innerHTML = '';
-	Object.keys(champions).forEach(championKey => {
-		const champion = champions[championKey];
-		const championIcon = document.createElement('img');
+    championGrid.innerHTML = '';
+    Object.keys(champions).forEach(championKey => {
+        const champion = champions[championKey];
+        const championIcon = document.createElement('img');
         championIcon.src = preloadedIcons[champion.id].src;
-		championIcon.alt = champion.id;
-		championIcon.classList.add('champion-icon');
-        if(usedChamps.has(champion.id) || fearlessChamps.has(champion.id)){
+        championIcon.alt = champion.id;
+        championIcon.classList.add('champion-icon');
+        if (usedChamps.has(champion.id) || fearlessChamps.has(champion.id)) {
             championIcon.classList.add('used');
             championIcon.style.filter = 'grayscale(100%)';
         } else {
             championIcon.addEventListener('click', () => {
                 const currSlot = getCurrSlot();
-                if(currSlot === "done"){
+                if (currSlot === "done") {
                     return;
                 }
-                if(currSlot[0] != side){
+                if (currSlot[0] != side) {
                     return;
                 }
-                if(currSlot[1] === 'B'){ //ban
+                if (currSlot[1] === 'B') { //ban
                     let banSlot = document.querySelector(`#blue-bans .ban-slot:nth-child(${currSlot[2]})`);
-                    if(currSlot[0] === 'R'){ //red side ban
+                    if (currSlot[0] === 'R') { //red side ban
                         banSlot = document.querySelector(`#red-bans .ban-slot:nth-child(${6-currSlot[2]})`);
                     }
                     const banImage = banSlot.querySelector('img');
                     banImage.src = preloadedIcons[champion.id].src;
                 } else { //pick
                     let pickSlot = document.querySelector(`#blue-picks .pick-slot:nth-child(${currSlot[2]})`);
-                    if(currSlot[0] === 'R'){ //red side ban
+                    if (currSlot[0] === 'R') { //red side ban
                         pickSlot = document.querySelector(`#red-picks .pick-slot:nth-child(${currSlot[2]})`);
                     }
                     const pickImage = pickSlot.querySelector('img');
@@ -156,36 +158,36 @@ function displayChampions(champions) {
                 confirmButton.disabled = false;
             });
         }
-		championGrid.appendChild(championIcon);
-	});
+        championGrid.appendChild(championIcon);
+    });
 }
 
 function filterChampions() {
-	const searchTerm = searchInput.value.toLowerCase();
-	const filteredChampions = Object.values(champions).filter(champion => {
-		const matchesRole = selectedRole === '' || champion.roles.includes(selectedRole.toUpperCase());
-		const matchesSearch = champion.id.toLowerCase().includes(searchTerm);
-		return matchesRole && matchesSearch;
-	});
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredChampions = Object.values(champions).filter(champion => {
+        const matchesRole = selectedRole === '' || champion.roles.includes(selectedRole.toUpperCase());
+        const matchesSearch = champion.id.toLowerCase().includes(searchTerm);
+        return matchesRole && matchesSearch;
+    });
 
-	displayChampions(filteredChampions);
+    displayChampions(filteredChampions);
 }
 
 const roleIcons = document.querySelectorAll('.role-icon');
 let selectedRole = '';
 roleIcons.forEach(icon => {
-	icon.addEventListener('click', () => {
-		const role = icon.getAttribute('data-role');
-		if (selectedRole === role) {
-			selectedRole = '';
-			icon.classList.remove('active');
-		} else {
-			selectedRole = role;
-			roleIcons.forEach(icon => icon.classList.remove('active'));
-			icon.classList.add('active');
-		}
-		filterChampions();
-	});
+    icon.addEventListener('click', () => {
+        const role = icon.getAttribute('data-role');
+        if (selectedRole === role) {
+            selectedRole = '';
+            icon.classList.remove('active');
+        } else {
+            selectedRole = role;
+            roleIcons.forEach(icon => icon.classList.remove('active'));
+            icon.classList.add('active');
+        }
+        filterChampions();
+    });
 });
 
 const searchInput = document.getElementById('searchInput');
@@ -198,24 +200,30 @@ confirmButton.addEventListener('click', () => {
             blueReady = true;
             confirmButton.textContent = 'Waiting for Red...';
             confirmButton.disabled = true;
-            socket.emit('playerReady', { draftId, side: 'blue' });
+            socket.emit('playerReady', {
+                draftId,
+                side: 'blue'
+            });
         } else if (side === 'R') {
             redReady = true;
             confirmButton.textContent = 'Waiting for Blue...';
             confirmButton.disabled = true;
-            socket.emit('playerReady', { draftId, side: 'red' });
+            socket.emit('playerReady', {
+                draftId,
+                side: 'red'
+            });
         }
     } else {
         lockChamp();
     }
 });
 
-function colorBorder(){
+function colorBorder() {
     let currSlot = getCurrSlot();
-    if(currSlot === "done"){
+    if (currSlot === "done") {
         return;
     }
-    if(currSlot[0] === 'B'){ //make border of blue-side-header gold
+    if (currSlot[0] === 'B') { //make border of blue-side-header gold
         document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
         document.querySelector('#red-side-header').style.border = '2px solid black';
     } else {
@@ -230,8 +238,8 @@ function updateFearlessBanSlots() {
     const redFearlessBanSlots = document.querySelectorAll('#red-fearless-bans .fearless-ban-slot');
     const blueFearlessBansDiv = document.querySelector('#blue-fearless-bans');
     const redFearlessBansDiv = document.querySelector('#red-fearless-bans');
-    
-    switch(matchNumber) {
+
+    switch (matchNumber) {
         case 1:
             fearlessBansPerSide = 0;
             leftMargin = 0;
@@ -262,17 +270,17 @@ function updateFearlessBanSlots() {
     blueFearlessBanSlots.forEach((slot, index) => {
         slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
     });
-    
+
     redFearlessBanSlots.forEach((slot, index) => {
         slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
     });
     blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
     redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
-            
-function lockChamp(){
+
+function lockChamp() {
     const currSlot = getCurrSlot();
-    if(currSlot[0] != side){
+    if (currSlot[0] != side) {
         return;
     }
     if (selectedChampion) {
@@ -280,12 +288,18 @@ function lockChamp(){
         selectedChampion = null;
         confirmButton.disabled = true;
         usedChamps.add(championName);
-        socket.emit('pickSelection', {draftId, pick: championName});
+        socket.emit('pickSelection', {
+            draftId,
+            pick: championName
+        });
     } else {
-        socket.emit('pickSelection', {draftId, pick: "placeholder"});
+        socket.emit('pickSelection', {
+            draftId,
+            pick: "placeholder"
+        });
     }
     currPick++;
-    if(currPick <= 20){
+    if (currPick <= 20) {
         colorBorder();
         filterChampions();
         startTimer();
@@ -307,19 +321,20 @@ function startDraft() {
     colorBorder();
     startTimer();
 }
-function fearlessBan(champions){
+
+function fearlessBan(champions) {
     let fearlessBanSlot = 0
     blueCounter = 1;
     redCounter = 1;
     champions.forEach((pick, index) => {
-        if(pick == 'placeholder'){
+        if (pick == 'placeholder') {
             fearlessBanSlot++;
             return;
         }
-        fearlessBanSlot = (index+1)%10;
+        fearlessBanSlot = (index + 1) % 10;
         let banSlot = null;
         let banImage = null;
-        switch(fearlessBanSlot){
+        switch (fearlessBanSlot) {
             case 1:
             case 4:
             case 5:
@@ -346,14 +361,14 @@ function fearlessBan(champions){
     });
 }
 
-function newPick(picks){
+function newPick(picks) {
     picks.forEach((pick, index) => {
-        if(pick == 'placeholder'){
+        if (pick == 'placeholder') {
             currPick++;
             colorBorder();
             return; //TODO: is this ok
         }
-        currPick = index+1;
+        currPick = index + 1;
         const slot = getCurrSlot(currPick);
         if (slot[1] === 'B') {
             const banSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-bans .ban-slot:nth-child(${slot[0] === 'B' ? slot[2] : 6-slot[2]})`);
@@ -371,7 +386,7 @@ function newPick(picks){
     displayChampions(champions);
 }
 
-function endDraft(){
+function endDraft() {
     socket.emit("endDraft", draftId);
 }
 
@@ -406,7 +421,7 @@ socket.on('draftState', (data) => {
     picks = data.picks;
     fearlessChamps = new Set(data.fearlessBans);
     matchNumber = data.matchNumber;
-    if(draftStarted){
+    if (draftStarted) {
         newPick(picks);
         updateFearlessBanSlots();
         fearlessBan(data.fearlessBans);
@@ -426,7 +441,9 @@ socket.on('draftState', (data) => {
 });
 
 socket.on('timerUpdate', (data) => {
-    const { timeLeft } = data;
+    const {
+        timeLeft
+    } = data;
     const timerElement = document.getElementById('timer');
     timerElement.textContent = timeLeft >= 0 ? timeLeft : 0;
 });
@@ -439,7 +456,7 @@ socket.on('pickUpdate', (picks) => {
     newPick(picks);
 });
 
-document.addEventListener('DOMContentLoaded', async() => {
+document.addEventListener('DOMContentLoaded', async () => {
     await loadChamps();
     preloadChampionImages();
     filterChampions();

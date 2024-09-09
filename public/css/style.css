@@ -1,35 +1,35 @@
 body {
     background-color: #303030;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     text-align: center;
-  }
+}
 h1 {
     color: white;
 }
 
-  #create-draft {
+#create-draft {
     margin-top: 30px;
     padding: 20px;
     background-color: #f2f2f2;
     border-radius: 5px;
     display: inline-block;
-  }
+}
 
-  #create-draft label {
+#create-draft label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     margin-top: 10px;
-  }
+}
 
-  #create-draft input[type="text"] {
+#create-draft input[type="text"] {
     padding: 5px;
     width: 200px;
     border: 1px solid #ccc;
     border-radius: 3px;
-  }
+}
 
-  #create-draft button {
+#create-draft button {
     margin-top: 10px;
     padding: 10px 20px;
     background-color: rgb(236, 209, 59);
@@ -38,41 +38,41 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-  }
+}
 
-  #draft-links {
+#draft-links {
     margin-top: 30px;
-  }
+}
 
-  .link-container {
+.link-container {
     margin-bottom: 20px;
     padding: 10px;
     border-radius: 5px;
-  }
+}
 
-  .link-container p {
+.link-container p {
     margin: 0;
     color: white;
-  }
+}
 
-  .link-container a {
+.link-container a {
     color: white;
     text-decoration: none;
-  }
+}
 
-  .blue-link {
+.blue-link {
     background-color: #3537ae;
-  }
+}
 
-  .red-link {
+.red-link {
     background-color: #b70b0b;
-  }
+}
 
-  .spectator-link {
+.spectator-link {
     background-color: #000000;
-  }
+}
 
-  .copy-button {
+.copy-button {
     margin-left: 10px;
     padding: 5px 10px;
     background-color: rgb(236, 209, 59);
@@ -80,9 +80,9 @@ h1 {
     border: none;
     border-radius: 3px;
     cursor: pointer;
-  }
+}
 
-  .copy-all-button {
+.copy-all-button {
     margin-top: 20px;
     padding: 10px 20px;
     background-color: rgb(236, 209, 59);
@@ -91,9 +91,9 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-  }
+}
 
-  .social-icons {
+.social-icons {
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -101,13 +101,13 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .social-icons a {
+}
+
+.social-icons a {
     margin: 0 3px;
-  }
-  
-  .social-icons img {
+}
+
+.social-icons img {
     width: 50px;
     height: 50px;
-  }
+}

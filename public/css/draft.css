@@ -1,43 +1,43 @@
 body {
     background-color: #303030;
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  .draft-container {
+    font-family: "Roboto", sans-serif;
+}
+
+.draft-container {
     display: flex;
     justify-content: space-between;
     margin: 20px;
-  }
-  
-  .champion-pool-container {
+}
+
+.champion-pool-container {
     flex-grow: 1;
     margin: 0 20px;
     display: flex;
     flex-direction: column;
-  }
-  
-  .champion-pool-wrapper {
+}
+
+.champion-pool-wrapper {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }
+}
 
-  #timer {
+#timer {
     font-size: 32px;
     font-weight: bold;
     color: #ffffff;
-  }
-  
-  .filter-container {
+}
+
+.filter-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 5px;
     margin-bottom: 10px;
     padding: 0 5px;
-  }
-  
-  .blue-side-header {
+}
+
+.blue-side-header {
     margin-right: 20px;
     margin-left: 20px;
     margin-top: 0px;
@@ -49,9 +49,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .red-side-header {
+}
+
+.red-side-header {
     margin-right: 20px;
     margin-left: 20px;
     margin-top: 0px;
@@ -63,86 +63,85 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .role-filter {
+}
+
+.role-filter {
     display: flex;
     align-items: center;
-  }
-  
-  .role-icon {
+}
+
+.role-icon {
     width: 30px;
     height: 30px;
     margin-right: 10px;
     cursor: pointer;
     opacity: 0.6;
-  }
-  
-  .role-icon.active {
+}
+
+.role-icon.active {
     opacity: 1;
-  }
-  
-  .search-bar {
+}
+
+.search-bar {
     display: flex;
     justify-content: flex-end;
     padding: 0 5px;
-  }
-  
-  .search-bar input {
+}
+
+.search-bar input {
     padding: 3px;
     font-size: 18px;
     color: #747474;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: black;
-  }
-  
-  .champion-pool {
+}
+
+.champion-pool {
     flex-grow: 1;
     max-height: 425px;
     overflow-y: auto;
     border: 0px solid #515151;
     padding: 5px;
+}
 
-  }
-  
-  .champion-icon {
+.champion-icon {
     width: 75px;
     height: 75px;
     margin: 0px;
     cursor: pointer;
-  }
-  
-  #champion-grid {
+}
+
+#champion-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(75px, 0fr));
     grid-gap: 2px;
     justify-items: center;
-  }
-  
-  .blue-side,
-  .red-side {
+}
+
+.blue-side,
+.red-side {
     width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  #blue-bans {
+}
+
+#blue-bans {
     display: flex;
     justify-content: flex-start;
     margin-top: 3px;
     margin-left: 35px;
-  }
-  
-  #red-bans {
+}
+
+#red-bans {
     display: flex;
     justify-content: flex-end;
     margin-top: 3px;
     margin-right: 19px;
-  }
-  
-  .pick-slot {
+}
+
+.pick-slot {
     width: 240px;
     height: 83px;
     border-radius: 4px;
@@ -152,9 +151,9 @@ body {
     font-size: 18px;
     margin-bottom: 5px;
     overflow: hidden;
-  }
-  
-  .ban-slot {
+}
+
+.ban-slot {
     width: 45px;
     height: 45px;
     border-radius: 4px;
@@ -164,16 +163,16 @@ body {
     font-size: 18px;
     margin-right: 10px;
     overflow: hidden;
-  }
-  
-  .pick-slot img,
-  .ban-slot img, 
-  .fearless-ban-slot img {
+}
+
+.pick-slot img,
+.ban-slot img,
+.fearless-ban-slot img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: 4px;
-  }
+}
 
 #blue-fearless-bans {
     display: flex;
@@ -191,11 +190,11 @@ body {
 
 #blue-fearless-bans::before,
 #red-fearless-bans::before {
-    content: '';
+    content: "";
     flex-grow: 1;
 }
 
-  .fearless-ban-slot {
+.fearless-ban-slot {
     width: 25px;
     height: 25px;
     border-radius: 4px;
@@ -205,18 +204,18 @@ body {
     font-size: 18px;
     margin-right: 5px;
     overflow: hidden;
-  }
-  
-  #confirmButton {
+}
+
+#confirmButton {
     display: block;
     margin: 10px auto 0;
     padding: 10px 20px;
     font-size: 16px;
     background-color: rgb(236, 209, 59);
     border: 0;
-  }
-  
-  #confirmButton:disabled {
+}
+
+#confirmButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
+}

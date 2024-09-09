@@ -5,23 +5,26 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z9QVY05JLL"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
 
-    gtag('config', 'G-Z9QVY05JLL');
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'G-Z9QVY05JLL');
     </script>
-
     <script>
         const draftId = '<%= draftId %>';
         const sideSelect = '<%= side %>';
+        // const blueTeamName = '<%= blueTeamName %>';
+        // const redTeamName = '<%= redTeamName %>';
     </script>
 </head>
 <body>
     <div class="draft-container">
         <div class="blue-side">
             <div id="blue-side-header" class="blue-side-header">
-                <h2>Blue</h2>
+                <h2><%= blueTeamName %> </h2>
             </div>
             <div id="blue-picks">
                 <div class="pick-slot">
@@ -115,7 +118,7 @@
                     <img src="/img/bot_icon.png" alt="Bot" data-role="bottom" class="role-icon">
                     <img src="/img/supp_icon.png" alt="Support" data-role="utility" class="role-icon">
                 </div>
-                    <div id="timer">30</div>
+                <div id="timer">30</div>
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Search champion...">
                 </div>
@@ -131,7 +134,7 @@
         </div>
         <div class="red-side">
             <div id="red-side-header" class="red-side-header">
-                <h2>Red</h2>
+                <h2><%= redTeamName %> </h2>
             </div>
             <div id="red-picks">
                 <div class="pick-slot">

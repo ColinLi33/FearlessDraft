@@ -285,24 +285,3 @@ function updateFearlessBanSlots() {
     blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
     redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
-
-function handleSocketEvents() {
-    socket.on('draftUpdate', (data) => {
-        console.log('Draft update:', data);
-        currPick = data.currPick;
-        usedChamps = new Set(data.usedChamps);
-        timeLeft = data.timeLeft;
-        matchNumber = data.matchNumber;
-        filterChampions();
-        colorBorder();
-        updateTimer();
-        updateFearlessBanSlots();
-    });
-}
-socket.on('connect', handleSocketEvents);
-function startTimer() {
-    socket.emit('startTimer');
-}
-function resetTimer() {
-    socket.emit('resetTimer');
-}

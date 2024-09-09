@@ -1,222 +1,94 @@
 body {
     background-color: #303030;
     font-family: 'Roboto', sans-serif;
+    text-align: center;
   }
-  
-  .draft-container {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px;
-  }
-  
-  .champion-pool-container {
-    flex-grow: 1;
-    margin: 0 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .champion-pool-wrapper {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
-
-  #timer {
-    font-size: 32px;
-    font-weight: bold;
-    color: #ffffff;
-  }
-  
-  .filter-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    padding: 0 5px;
-  }
-  
-  .blue-side-header {
-    margin-right: 20px;
-    margin-left: 20px;
-    margin-top: 0px;
-    margin-bottom: 5px;
-    height: 40px;
-    width: 240px;
-    color: #ffffff;
-    background-color: #3537ae;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .red-side-header {
-    margin-right: 20px;
-    margin-left: 20px;
-    margin-top: 0px;
-    margin-bottom: 5px;
-    height: 40px;
-    width: 240px;
-    color: #ffffff;
-    background-color: #b70b0b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .role-filter {
-    display: flex;
-    align-items: center;
-  }
-  
-  .role-icon {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
-    cursor: pointer;
-    opacity: 0.6;
-  }
-  
-  .role-icon.active {
-    opacity: 1;
-  }
-  
-  .search-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 5px;
-  }
-  
-  .search-bar input {
-    padding: 3px;
-    font-size: 18px;
-    color: #747474;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: black;
-  }
-  
-  .champion-pool {
-    flex-grow: 1;
-    max-height: 425px;
-    overflow-y: auto;
-    border: 0px solid #515151;
-    padding: 5px;
-
-  }
-  
-  .champion-icon {
-    width: 75px;
-    height: 75px;
-    margin: 0px;
-    cursor: pointer;
-  }
-  
-  #champion-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(75px, 0fr));
-    grid-gap: 2px;
-    justify-items: center;
-  }
-  
-  .blue-side,
-  .red-side {
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  #blue-bans {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 3px;
-    margin-left: 35px;
-  }
-  
-  #red-bans {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 3px;
-    margin-right: 19px;
-  }
-  
-  .pick-slot {
-    width: 240px;
-    height: 83px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin-bottom: 5px;
-    overflow: hidden;
-  }
-  
-  .ban-slot {
-    width: 45px;
-    height: 45px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin-right: 10px;
-    overflow: hidden;
-  }
-  
-  .pick-slot img,
-  .ban-slot img, 
-  .fearless-ban-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
-  }
-
-#blue-fearless-bans {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 7px;
-    margin-left: 60px;
+h1 {
+    color: white;
 }
 
-#red-fearless-bans {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 7px;
-    margin-right: 54px;
-}
-
-#blue-fearless-bans::before,
-#red-fearless-bans::before {
-    content: '';
-    flex-grow: 1;
-}
-
-  .fearless-ban-slot {
-    width: 25px;
-    height: 25px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin-right: 5px;
-    overflow: hidden;
+  #create-draft {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    display: inline-block;
   }
-  
-  #confirmButton {
+
+  #create-draft label {
     display: block;
-    margin: 10px auto 0;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: rgb(236, 209, 59);
-    border: 0;
+    margin-bottom: 5px;
+    font-weight: bold;
+    margin-top: 10px;
   }
-  
-  #confirmButton:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+
+  #create-draft input[type="text"] {
+    padding: 5px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+
+  #create-draft button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: rgb(236, 209, 59);
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  #draft-links {
+    margin-top: 30px;
+  }
+
+  .link-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .link-container p {
+    margin: 0;
+    color: white;
+  }
+
+  .link-container a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .blue-link {
+    background-color: #3537ae;
+  }
+
+  .red-link {
+    background-color: #b70b0b;
+  }
+
+  .spectator-link {
+    background-color: #000000;
+  }
+
+  .copy-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: rgb(236, 209, 59);
+    color: #000000;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .copy-all-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: rgb(236, 209, 59);
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
   }

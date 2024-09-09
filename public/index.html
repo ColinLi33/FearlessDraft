@@ -1,208 +1,82 @@
 <!DOCTYPE html>
+<html>
 <head>
-    <link rel="stylesheet" href="style.css">
+  <title>Create League of Legends Tournament Draft</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Function to create a new draft
+    function createDraft() {
+      const blueTeamName = document.getElementById('blue-team-name').value;
+      const redTeamName = document.getElementById('red-team-name').value;
+
+      fetch('/create-draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ blueTeamName, redTeamName })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('create-draft').style.display = 'none';
+        document.getElementById('draft-links').innerHTML = `
+          <div class="link-container blue-link">
+            <p>Blue Side Link: <a href="${data.blueLink}" target="_blank">${data.blueLink}</a>
+              <button class="copy-button" onclick="copyLink('${data.blueLink}')">Copy</button>
+            </p>
+          </div>
+          <div class="link-container red-link">
+            <p>Red Side Link: <a href="${data.redLink}" target="_blank">${data.redLink}</a>
+              <button class="copy-button" onclick="copyLink('${data.redLink}')">Copy</button>
+            </p>
+          </div>
+          <div class="link-container spectator-link">
+            <p>Spectator Link: <a href="${data.spectatorLink}" target="_blank">${data.spectatorLink}</a>
+              <button class="copy-button" onclick="copyLink('${data.spectatorLink}')">Copy</button>
+            </p>
+          </div>
+          <button class="copy-all-button" onclick="copyAllLinks('${data.blueLink}', '${data.redLink}', '${data.spectatorLink}')">Copy All Links</button>
+        `;
+      });
+    }
+
+    // Function to copy a link to the clipboard
+    function copyLink(link) {
+      const tempInput = document.createElement('input');
+      tempInput.value = link;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      alert('Link copied to clipboard!');
+    }
+
+    // Function to copy all links to the clipboard
+    function copyAllLinks(blueLink, redLink, spectatorLink) {
+      const links = `Blue Side Link: ${blueLink}\nRed Side Link: ${redLink}\nSpectator Link: ${spectatorLink}`;
+      const tempTextarea = document.createElement('textarea');
+      tempTextarea.value = links;
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextarea);
+      alert('All links copied to clipboard!');
+    }
+  </script>
 </head>
 <body>
-    <div class="draft-container">
-        <div class="blue-side">
-            <div id="blue-side-header" class="blue-side-header">
-                <h2>Blue</h2>
-            </div>
-            <div id="blue-picks">
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="B1">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="B2">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="B3">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="B4">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="B5">
-                </div>
-            </div>
-            <div id="blue-bans">
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="BB1">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="BB2">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="BB3">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="BB4">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="BB5">
-                </div>
-            </div>
-            <div id="blue-fearless-bans">
-                <!-- Fearless ban slots -->
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB1">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB2">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB3">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB4">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB5">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB6">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB7">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB8">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB9">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB10">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB11">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB12">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB13">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB14">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="BFB15">
-                </div>
-            </div>
-        </div>
-        <div class="champion-pool-container">
-            <div class="filter-container">
-                <div class="role-filter">
-                    <img src="img/top_icon.png" alt="Top" data-role="top" class="role-icon">
-                    <img src="img/jg_icon.png" alt="Jungle" data-role="jungle" class="role-icon">
-                    <img src="img/mid_icon.png" alt="Mid" data-role="middle" class="role-icon">
-                    <img src="img/bot_icon.png" alt="Bot" data-role="bottom" class="role-icon">
-                    <img src="img/supp_icon.png" alt="Support" data-role="utility" class="role-icon">
-                </div>
-                    <div id="timer">30</div>
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search champion...">
-                </div>
-            </div>
-            <div class="champion-pool-wrapper">
-                <div class="champion-pool">
-                    <div id="champion-grid"></div>
-                </div>
-                <div class="button-container">
-                    <button id="confirmButton" disabled>Lock In</button>
-                </div>
-            </div>
-        </div>
-        <div class="red-side">
-            <div id="red-side-header" class="red-side-header">
-                <h2>Red</h2>
-            </div>
-            <div id="red-picks">
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="R1">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="R2">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="R3">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="R4">
-                </div>
-                <div class="pick-slot">
-                    <img src="/img/placeholder.png" alt="R5">
-                </div>
-            </div>
-            <div id="red-bans">
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="RB1">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="RB2">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="RB3">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="RB4">
-                </div>
-                <div class="ban-slot">
-                    <img src="/img/placeholder.png" alt="RB5">
-                </div>
-            </div>
-            <div id="red-fearless-bans">
-                <!-- Fearless ban slots -->
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB1">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB2">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB3">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB4">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB5">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB6">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB7">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB8">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB9">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB10">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB11">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB12">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB13">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB14">
-                </div>
-                <div class="fearless-ban-slot">
-                    <img src="/img/placeholder.png" alt="RFB15">
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
+  <h1>Fearless Draft</h1>
+
+  <div id="create-draft">
+    <label for="blue-team-name">Blue Team Name:</label>
+    <input type="text" id="blue-team-name" value="Blue" required>
+    <br>
+    <label for="red-team-name">Red Team Name:</label>
+    <input type="text" id="red-team-name" value="Red" required>
+    <br>
+    <button onclick="createDraft()">Create Draft</button>
+  </div>
+
+  <div id="draft-links"></div>
 </body>
 </html>

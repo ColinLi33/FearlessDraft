@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="draft.css">
+</head>
+<body>
+    <div class="draft-container">
+        <div class="blue-side">
+            <div id="blue-side-header" class="blue-side-header">
+                <h2>Blue</h2>
+            </div>
+            <div id="blue-picks">
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="B1">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="B2">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="B3">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="B4">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="B5">
+                </div>
+            </div>
+            <div id="blue-bans">
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="BB1">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="BB2">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="BB3">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="BB4">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="BB5">
+                </div>
+            </div>
+            <div id="blue-fearless-bans">
+                <!-- Fearless ban slots -->
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB1">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB2">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB3">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB4">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB5">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB6">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB7">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB8">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB9">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB10">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB11">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB12">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB13">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB14">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="BFB15">
+                </div>
+            </div>
+        </div>
+        <div class="champion-pool-container">
+            <div class="filter-container">
+                <div class="role-filter">
+                    <img src="img/top_icon.png" alt="Top" data-role="top" class="role-icon">
+                    <img src="img/jg_icon.png" alt="Jungle" data-role="jungle" class="role-icon">
+                    <img src="img/mid_icon.png" alt="Mid" data-role="middle" class="role-icon">
+                    <img src="img/bot_icon.png" alt="Bot" data-role="bottom" class="role-icon">
+                    <img src="img/supp_icon.png" alt="Support" data-role="utility" class="role-icon">
+                </div>
+                    <div id="timer">30</div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search champion...">
+                </div>
+            </div>
+            <div class="champion-pool-wrapper">
+                <div class="champion-pool">
+                    <div id="champion-grid"></div>
+                </div>
+                <div class="button-container">
+                    <button id="confirmButton" disabled>Lock In</button>
+                </div>
+            </div>
+        </div>
+        <div class="red-side">
+            <div id="red-side-header" class="red-side-header">
+                <h2>Red</h2>
+            </div>
+            <div id="red-picks">
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="R1">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="R2">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="R3">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="R4">
+                </div>
+                <div class="pick-slot">
+                    <img src="/img/placeholder.png" alt="R5">
+                </div>
+            </div>
+            <div id="red-bans">
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="RB1">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="RB2">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="RB3">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="RB4">
+                </div>
+                <div class="ban-slot">
+                    <img src="/img/placeholder.png" alt="RB5">
+                </div>
+            </div>
+            <div id="red-fearless-bans">
+                <!-- Fearless ban slots -->
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB1">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB2">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB3">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB4">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB5">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB6">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB7">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB8">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB9">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB10">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB11">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB12">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB13">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB14">
+                </div>
+                <div class="fearless-ban-slot">
+                    <img src="/img/placeholder.png" alt="RFB15">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="draft.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ let matchNumber = 1;
 const preloadedImages = {};
 const preloadedIcons = {};
 let usedChamps = new Set();
+let fearlessChamps = new Set();
 let timerInterval = null;
 let timeLeft = 30;
 let side = null
@@ -124,7 +125,7 @@ function displayChampions(champions) {
         championIcon.src = preloadedIcons[champion.id].src;
 		championIcon.alt = champion.id;
 		championIcon.classList.add('champion-icon');
-        if(usedChamps.has(champion.id)){
+        if(usedChamps.has(champion.id) || fearlessChamps.has(champion.id)){
             championIcon.classList.add('used');
             championIcon.style.filter = 'grayscale(100%)';
         } else {
@@ -291,15 +292,58 @@ function lockChamp(){
     } else {
         confirmButton.textContent = 'Ready Next Game';
         confirmButton.disabled = false
+        currPick = 0
+        endDraft();
     }
 }
 
 function startDraft() {
     currPick = 1;
+    document.querySelectorAll('.ban-slot img').forEach(img => img.src = '/img/placeholder.png');
+    document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
     confirmButton.textContent = 'Lock In';
     confirmButton.disabled = false;
+    filterChampions();
     colorBorder();
     startTimer();
+}
+function fearlessBan(champions){
+    let fearlessBanSlot = 0
+    blueCounter = 1;
+    redCounter = 1;
+    champions.forEach((pick, index) => {
+        if(pick == 'placeholder'){
+            fearlessBanSlot++;
+            return;
+        }
+        fearlessBanSlot = (index+1)%10;
+        let banSlot = null;
+        let banImage = null;
+        switch(fearlessBanSlot){
+            case 1:
+            case 4:
+            case 5:
+            case 8:
+            case 9:
+                banSlot = document.querySelector(`#blue-fearless-bans .fearless-ban-slot:nth-child(${blueCounter})`);
+                banImage = banSlot.querySelector('img');
+                banImage.src = preloadedIcons[pick].src;
+                blueCounter++;
+                break;
+            case 2:
+            case 3:
+            case 6:
+            case 7:
+            case 0:
+                banSlot = document.querySelector(`#red-fearless-bans .fearless-ban-slot:nth-child(${redCounter})`);
+                banImage = banSlot.querySelector('img');
+                banImage.src = preloadedIcons[pick].src;
+                redCounter++;
+                break;
+            default:
+                break;
+        }
+    });
 }
 
 function newPick(picks){
@@ -307,7 +351,7 @@ function newPick(picks){
         if(pick == 'placeholder'){
             currPick++;
             colorBorder();
-            return;
+            return; //TODO: is this ok
         }
         currPick = index+1;
         const slot = getCurrSlot(currPick);
@@ -327,6 +371,10 @@ function newPick(picks){
     displayChampions(champions);
 }
 
+function endDraft(){
+    socket.emit("endDraft", draftId);
+}
+
 socket.on('playerReady', (data) => {
     blueReady = data.blueReady;
     redReady = data.redReady;
@@ -336,16 +384,37 @@ socket.on('playerReady', (data) => {
     }
 });
 
-socket.on('draftState', (data) => {;
+socket.on('draftEnded', (data) => {
+    currPick = 0;
+    fearlessChamps = new Set(data.fearlessBans);
+    blueReady = data.blueReady;
+    redReady = data.redReady;
+    draftStarted = data.started;
+    matchNumber = data.matchNumber;
+    picks = data.picks;
+    usedChamps = new Set();
+    confirmButton.textContent = 'Ready Next Game';
+    confirmButton.disabled = false;
+    updateFearlessBanSlots();
+    fearlessBan(data.fearlessBans);
+});
+
+socket.on('draftState', (data) => {
     blueReady = data.blueReady;
     redReady = data.redReady;
     draftStarted = data.started;
     picks = data.picks;
+    fearlessChamps = new Set(data.fearlessBans);
+    matchNumber = data.matchNumber;
     if(draftStarted){
         newPick(picks);
+        updateFearlessBanSlots();
+        fearlessBan(data.fearlessBans);
         return;
     }
     if (blueReady && redReady) {
+        //this never happens i ithkn maybe delete
+        alert("AHHHHHH")
         startDraft();
     } else if (blueReady && side === 'B') {
         confirmButton.textContent = 'Waiting for Red...';
@@ -373,7 +442,7 @@ socket.on('pickUpdate', (picks) => {
 document.addEventListener('DOMContentLoaded', async() => {
     await loadChamps();
     preloadChampionImages();
-    displayChampions(champions);
+    filterChampions();
     socket.emit('joinDraft', draftId);
     socket.emit('getData', draftId);
     updateFearlessBanSlots();

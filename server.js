@@ -49,8 +49,10 @@ app.post('/create-draft', (req, res) => {
         blueReady: false,
         redReady: false,
         picks: [],
+        fearlessBans: [],
         timer: null,
-        started: false
+        started: false,
+        matchNumber: 1
     };
     res.json({ blueLink, redLink, spectatorLink });
 });
@@ -72,8 +74,11 @@ app.post('/create-draft', (req, res) => {
                 blueReady: false,
                 redReady: false,
                 picks: [],
+                fearlessBans: [],
                 timer: null,
-                started: false
+                started: false,
+                matchNumber: 1
+
             };
         }
         if (side === 'blue') {
@@ -102,13 +107,38 @@ app.post('/create-draft', (req, res) => {
             }
         }, 1000);
     });
+
+    socket.on('endDraft', (draftId) => {
+        if(currStates[draftId].timer){
+            clearInterval(currStates[draftId].timer);
+            currStates[draftId].timer = null;
+        }
+        if(!currStates[draftId].fearlessBans){
+            currStates[draftId].fearlessBans = []
+        }
+        currStates[draftId].fearlessBans = currStates[draftId].fearlessBans.concat(currStates[draftId].picks.slice(6, 12)).concat(currStates[draftId].picks.slice(16, 20));
+        currStates[draftId].picks = []
+        currStates[draftId].blueReady = false;
+        currStates[draftId].redReady = false;
+        currStates[draftId].started = false;
+        currStates[draftId].matchNumber++;
+        io.to(draftId).emit('draftEnded', currStates[draftId]);
+    });
   
     socket.on('getData', (draftId) => {
         if(!currStates[draftId]){
-            socket.emit('draftState', { blueReady: false, redReady: false, picks: [], started: false });
+            socket.emit('draftState', { blueReady: false,
+                redReady: false,
+                picks: [],
+                fearlessBans: [],
+                timer: null,
+                started: false,
+                matchNumber: 1}
+            );
             return;
         }
-        data = { blueReady: currStates[draftId].blueReady, redReady: currStates[draftId].redReady, picks: currStates[draftId].picks, started: currStates[draftId].started };
+        //data = everything except timer
+        data = { blueReady: currStates[draftId].blueReady, redReady: currStates[draftId].redReady, picks: currStates[draftId].picks, started: currStates[draftId].started, fearlessBans: currStates[draftId].fearlessBans, matchNumber: currStates[draftId].matchNumber };
         socket.emit('draftState', data);
     });
   

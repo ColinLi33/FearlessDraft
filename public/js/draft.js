@@ -442,6 +442,9 @@ socket.on('showNextGameButton', () => {
     const switchSidesButton = document.getElementById('switchSidesButton');
     switchSidesButton.style.display = 'block';
     switchSidesButton.onclick = function() {
+        if(side === 'S'){
+            return;
+        }
         socket.emit('switchSides', draftId);
     };
 });
@@ -477,6 +480,9 @@ socket.on('draftState', (data) => {
             const switchSidesButton = document.getElementById('switchSidesButton');
             switchSidesButton.style.display = 'block';
             switchSidesButton.onclick = function() {
+                if(side === 'S'){
+                    return;
+                }
                 socket.emit('switchSides', draftId);
             };
         }

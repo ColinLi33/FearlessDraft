@@ -15,9 +15,7 @@ let blueReady = false;
 let redReady = false;
 
 function startTimer() {
-    socket.emit('startTimer', {
-        draftId
-    });
+    socket.emit('startTimer', draftId);
 }
 
 function getCurrSlot() {
@@ -198,9 +196,6 @@ confirmButton.addEventListener('click', () => {
     if (currPick === 0) {
         if(side === 'S'){
             return
-        }
-        if(draftStarted){
-            socket.emit('startNewDraft', draftId);
         }
         if (side === 'B') {
             blueReady = true;
@@ -426,17 +421,21 @@ function updateSide(sideSwapped, blueName, redName, initialLoad=false) {
     document.getElementById('red-team-name').textContent = redName;
 }
 
-socket.on('playerReady', (data) => {
+socket.on('startDraft', (data) => {
+    picks = data.picks;
+    draftStarted = data.started;
     blueReady = data.blueReady;
     redReady = data.redReady;
-    draftStarted = data.started;
-    if (!draftStarted && blueReady && redReady) {
-        startDraft();
-    }
+    fearlessChamps = new Set(data.fearlessBans);
+    matchNumber = data.matchNumber;
+    usedChamps = new Set();
+    updateFearlessBanSlots();
+    fearlessBan(data.fearlessBans);
+    startDraft();
 });
 
-socket.on('showNextGameButton', () => {
-    currPick = 0
+socket.on('showNextGameButton', () => { //draft ended
+    currPick = 0;
     confirmButton.textContent = 'Ready Next Game';
     confirmButton.disabled = false;
     const switchSidesButton = document.getElementById('switchSidesButton');
@@ -447,19 +446,9 @@ socket.on('showNextGameButton', () => {
         }
         socket.emit('switchSides', draftId);
     };
-});
-
-socket.on('draftEnded', (data) => {
-    currPick = 0;
-    fearlessChamps = new Set(data.fearlessBans);
     blueReady = data.blueReady;
     redReady = data.redReady;
     draftStarted = data.started;
-    matchNumber = data.matchNumber;
-    picks = data.picks;
-    usedChamps = new Set();
-    updateFearlessBanSlots();
-    fearlessBan(data.fearlessBans);
 });
 
 socket.on('draftState', (data) => {
@@ -473,26 +462,19 @@ socket.on('draftState', (data) => {
     updateSide(sideSwapped, data.blueTeamName, data.redTeamName, true);
     updateFearlessBanSlots();
     fearlessBan(data.fearlessBans);
-    if (draftStarted) {
-        newPick(picks);
-        if(picks.length===20){
-            currPick = 0;
-            const switchSidesButton = document.getElementById('switchSidesButton');
-            switchSidesButton.style.display = 'block';
-            switchSidesButton.onclick = function() {
-                if(side === 'S'){
-                    return;
-                }
-                socket.emit('switchSides', draftId);
-            };
-        }
-        return;
+    newPick(picks);
+    if(picks.length===20){
+        currPick = 0;
+        const switchSidesButton = document.getElementById('switchSidesButton');
+        switchSidesButton.style.display = 'block';
+        switchSidesButton.onclick = function() {
+            if(side === 'S'){
+                return;
+            }
+            socket.emit('switchSides', draftId);
+        };
     }
-    if (blueReady && redReady) {
-        //this never happens i ithkn maybe delete
-        alert("AHHHHHH")
-        startDraft();
-    } else if (blueReady && side === 'B') {
+    if (blueReady && side === 'B') {
         confirmButton.textContent = 'Waiting for Red...';
         confirmButton.disabled = true;
     } else if (redReady && side === 'R') {

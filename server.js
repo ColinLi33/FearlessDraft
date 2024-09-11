@@ -7,8 +7,8 @@ const uuid = require('uuid');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-const domain = 'https://www.fearlessdraft.net';
-// const domain = 'http://localhost:3333';
+// const domain = 'https://www.fearlessdraft.net';
+const domain = 'http://localhost:3333';
 
 const currStates = {};
 
@@ -110,13 +110,19 @@ io.on('connection', (socket) => {
         } else if (side === 'red') {
             currStates[draftId].redReady = true;
         }
-        io.to(draftId).emit('playerReady', currStates[draftId]);
+        if(currStates[draftId].blueReady && currStates[draftId].redReady) {
+            if (!currStates[draftId].fearlessBans) {
+                currStates[draftId].fearlessBans = []
+            }
+            currStates[draftId].fearlessBans = currStates[draftId].fearlessBans.concat(currStates[draftId].picks.slice(6, 12)).concat(currStates[draftId].picks.slice(16, 20));
+            currStates[draftId].picks = []
+            currStates[draftId].started = true;
+            io.to(draftId).emit('startDraft', currStates[draftId]);
+        } 
     });
 
     socket.on('startTimer', (data) => {
-        const {
-            draftId
-        } = data;
+        const draftId = data;
         currStates[draftId].started = true;
         if (currStates[draftId].timer) {
             clearInterval(currStates[draftId].timer);
@@ -141,21 +147,13 @@ io.on('connection', (socket) => {
             clearInterval(currStates[draftId].timer);
             currStates[draftId].timer = null;
         }
-        io.to(draftId).emit('showNextGameButton');
-    });
-
-    socket.on('startNewDraft', (draftId) => {
-        if (!currStates[draftId].fearlessBans) {
-            currStates[draftId].fearlessBans = []
-        }
-        currStates[draftId].fearlessBans = currStates[draftId].fearlessBans.concat(currStates[draftId].picks.slice(6, 12)).concat(currStates[draftId].picks.slice(16, 20));
-        currStates[draftId].picks = []
         currStates[draftId].blueReady = false;
         currStates[draftId].redReady = false;
         currStates[draftId].started = false;
         currStates[draftId].matchNumber++;
-        io.to(draftId).emit('draftEnded', currStates[draftId]);
+        io.to(draftId).emit('showNextGameButton', currStates[draftId]);
     });
+
 
     socket.on('getData', (draftId) => {
         if (!currStates[draftId]) {

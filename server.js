@@ -7,8 +7,8 @@ const uuid = require('uuid');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-// const domain = 'https://www.fearlessdraft.net';
-const domain = 'http://localhost:3333';
+const domain = 'https://www.fearlessdraft.net';
+// const domain = 'http://localhost:3333';
 
 const currStates = {};
 

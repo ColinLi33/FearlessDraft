@@ -384,6 +384,9 @@ function newPick(picks) {
         usedChamps.add(pick);
         currPick++;
     });
+    if(draftStarted && picks.length == 0){
+        currPick = 1;
+    }
     colorBorder();
     displayChampions(champions);
 }

@@ -86,25 +86,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playerReady', (data) => {
-        const {
-            draftId,
-            side
-        } = data;
-        if (!currStates[draftId]) {
-            currStates[draftId] = {
-                blueReady: false,
-                redReady: false,
-                picks: [],
-                fearlessBans: [],
-                timer: null,
-                started: false,
-                matchNumber: 1,
-                sideSwapped: false,
-                blueTeamName: 'Blue',
-                redTeamName: 'Red'
-
-            };
-        }
+        const {draftId, side} = data;
         if (side === 'blue') {
             currStates[draftId].blueReady = true;
         } else if (side === 'red') {
@@ -142,21 +124,9 @@ io.on('connection', (socket) => {
         }, 1000);
     });
 
-    socket.on('endDraft', (draftId) => {
-        if (currStates[draftId].timer) {
-            clearInterval(currStates[draftId].timer);
-            currStates[draftId].timer = null;
-        }
-        currStates[draftId].blueReady = false;
-        currStates[draftId].redReady = false;
-        currStates[draftId].started = false;
-        currStates[draftId].matchNumber++;
-        io.to(draftId).emit('showNextGameButton', currStates[draftId]);
-    });
 
-
-    socket.on('getData', (draftId) => {
-        if (!currStates[draftId]) {
+    socket.on('getData', (draftId) => { //sends the state to people who open page
+        if (!currStates[draftId]) { //not sure if this is needed
             socket.emit('draftState', {
                 blueReady: false,
                 redReady: false,
@@ -186,20 +156,31 @@ io.on('connection', (socket) => {
         socket.emit('draftState', data);
     });
 
-    socket.on('pickSelection', (data) => {
-        const {
-            draftId,
-            pick
-        } = data;
+    socket.on('pickSelection', (data) => { //new pick made
+        const {draftId,pick} = data;
         if (currStates[draftId]) {
             currStates[draftId].picks.push(pick);
             io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
         }
     });
 
-    socket.on('switchSides', (draftId) => {
+    socket.on('endDraft', (draftId) => { //ends draft
+        if (currStates[draftId].timer) {
+            clearInterval(currStates[draftId].timer);
+            currStates[draftId].timer = null;
+        }
+        currStates[draftId].blueReady = false;
+        currStates[draftId].redReady = false;
+        currStates[draftId].started = false;
+        currStates[draftId].matchNumber++;
+        io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+    });
+
+    socket.on('switchSides', (draftId) => { //switches sides 
         if (currStates[draftId]) {
             currStates[draftId].sideSwapped = !currStates[draftId].sideSwapped;
+            currStates[draftId].blueReady = false;
+            currStates[draftId].redReady = false;
             if(currStates[draftId].blueTeamName === 'Blue' || currStates[draftId].redTeamName === 'Red') {
                 io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
                 return;

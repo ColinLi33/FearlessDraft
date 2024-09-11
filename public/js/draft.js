@@ -462,12 +462,17 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
             };
         }
     }
-    if (blueReady && side === 'B') {
-        confirmButton.textContent = 'Waiting for Red...';
+    if(blueReady && redReady){
+        confirmButton.textContent = 'Lock In';
         confirmButton.disabled = true;
-    } else if (redReady && side === 'R') {
-        confirmButton.textContent = 'Waiting for Blue...';
-        confirmButton.disabled = true;
+    } else{
+        if (blueReady && side === 'B') {
+            confirmButton.textContent = 'Waiting for Red...';
+            confirmButton.disabled = true;
+        } else if (redReady && side === 'R') {
+            confirmButton.textContent = 'Waiting for Blue...';
+            confirmButton.disabled = true;
+        }
     }
     if (side === 'S') {
         confirmButton.style.display = 'none';

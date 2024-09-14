@@ -17,6 +17,8 @@ const championGrid = document.getElementById('champion-grid');
 const searchInput = document.getElementById('searchInput');
 const confirmButton = document.getElementById('confirmButton');
 const switchSidesButton = document.getElementById('switchSidesButton');
+const roleIcons = document.querySelectorAll('.role-icon');
+let selectedRole = '';
 let selectedChampion = null;
 let viewingPreviousDraft = false
 
@@ -175,8 +177,6 @@ function filterChampions() { //filter champions based on search and role
 	displayChampions(filteredChampions);
 }
 
-const roleIcons = document.querySelectorAll('.role-icon');
-let selectedRole = '';
 roleIcons.forEach(icon => {
 	icon.addEventListener('click', () => {
 		const role = icon.getAttribute('data-role');
@@ -309,9 +309,12 @@ function lockChamp() { //lock in champ
         confirmButton.disabled = true;
 	}
 	currPick++;
+    searchInput.value = '';
+    selectedRole = '';
+    roleIcons.forEach(icon => icon.classList.remove('active'));
+    filterChampions();
 	if (currPick <= 20) {
 		colorBorder();
-		displayChampions(champions);
 		startTimer();
 	} else {
 		confirmButton.textContent = 'Ready Next Game';
@@ -396,7 +399,7 @@ function newPick(picks) {
 		currPick = 1;
 	}
 	colorBorder();
-	displayChampions(champions);
+	filterChampions();
 }
 
 function updateSide(sideSwapped, blueName, redName, initialLoad = false) {
@@ -411,7 +414,10 @@ function updateSide(sideSwapped, blueName, redName, initialLoad = false) {
 	document.getElementById('red-team-name').textContent = redName;
 	if (!sideSwapped) {
 		if (!initialLoad)
-			alert(`You are now on ${side}`);
+            if(side !== 'S')
+			    alert(`You are now on ${side}`);
+            else
+                alert(`Sides Swapped`);
 		return
 	}
 	if (side === 'B') {

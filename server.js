@@ -5,10 +5,12 @@ const socketIO = require('socket.io');
 const fetch = require('node-fetch');
 const uuid = require('uuid');
 const mongoose = require('mongoose');
+const NodeCache = require('node-cache');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+const cache = new NodeCache({ stdTTL: 86400 }); // Cache for 1 day
 const domain = 'https://www.fearlessdraft.net';
 // const domain = 'http://localhost:3333';
 
@@ -103,7 +105,6 @@ function checkFinishedDrafts() {
 	Object.keys(currStates).forEach((draftId) => {
 		if (!currStates[draftId].finished && isDraftFinished(draftId)) {
 			currStates[draftId].finished = true;
-           // saveDraft(currStates[draftId], currStates[draftId].picks, currStates[draftId].fearlessBans, currStates[draftId].matchNumber, currStates[draftId].blueTeamName, currStates[draftId].redTeamName);
 			console.log(`Draft ${draftId} is finished.`);
 			delete currStates[draftId];
 		}
@@ -111,9 +112,15 @@ function checkFinishedDrafts() {
 }
 
 app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
+    const cacheKey = 'championrates';
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+        return res.json(cachedData);
+    }
 	try {
 		const response = await fetch('https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/championrates.json');
 		const data = await response.json();
+        cache.set(cacheKey, data);
 		res.json(data);
 	} catch (error) {
 		console.error('Error fetching data:', error);

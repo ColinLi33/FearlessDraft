@@ -311,7 +311,7 @@ function lockChamp() { //lock in champ
 	currPick++;
 	if (currPick <= 20) {
 		colorBorder();
-		filterChampions();
+		displayChampions();
 		startTimer();
 	} else {
 		confirmButton.textContent = 'Ready Next Game';
@@ -327,7 +327,7 @@ function startDraft() {
 	document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
 	confirmButton.textContent = 'Lock In';
 	switchSidesButton.style.display = 'none';
-	filterChampions();
+	displayChampions();
 	colorBorder();
 	startTimer();
 }
@@ -567,7 +567,7 @@ socket.on('showDraftResponse', (data) => {
 document.addEventListener('DOMContentLoaded', async () => {
 	await loadChamps();
 	preloadChampionImages();
-	filterChampions();
+	displayChampions();
 	socket.emit('joinDraft', draftId);
 	socket.emit('getData', draftId);
 	if (side === 'S') {

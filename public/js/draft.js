@@ -18,6 +18,7 @@ const searchInput = document.getElementById('searchInput');
 const confirmButton = document.getElementById('confirmButton');
 const switchSidesButton = document.getElementById('switchSidesButton');
 let selectedChampion = null;
+let viewingPreviousDraft = false
 
 function startTimer() {
 	socket.emit('startTimer', draftId);
@@ -222,6 +223,9 @@ confirmButton.addEventListener('click', () => { //lock in/ready button
 });
 
 function colorBorder() { //shows who is picking currently
+    if(viewingPreviousDraft){
+        return;
+    }
 	let currSlot = getCurrSlot();
 	if (currSlot === "done") {
 		return;
@@ -451,6 +455,7 @@ socket.on('timerUpdate', (data) => { //updates timer
 
 socket.on('draftState', (data) => { //updates screen when page loaded with draft state
 	if (data.finished) {
+        viewingPreviousDraft = true;
 		socket.emit('showDraft', draftId, 1)
 		return;
 		//call showDraft

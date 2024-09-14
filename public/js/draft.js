@@ -130,6 +130,8 @@ function displayChampions(champions) { //display champion grid
 		if (usedChamps.has(champion.id) || fearlessChamps.has(champion.id)) {
 			championIcon.classList.add('used');
 			championIcon.style.filter = 'grayscale(100%)';
+            //remove event listener
+            championIcon.removeEventListener('click', () => {});
 		} else {
 			championIcon.addEventListener('click', () => {
 				const currSlot = getCurrSlot();
@@ -300,6 +302,7 @@ function lockChamp() { //lock in champ
 			draftId,
 			pick: "placeholder"
 		});
+        confirmButton.disabled = true;
 	}
 	currPick++;
 	if (currPick <= 20) {
@@ -319,7 +322,6 @@ function startDraft() {
 	document.querySelectorAll('.ban-slot img').forEach(img => img.src = '/img/placeholder.png');
 	document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
 	confirmButton.textContent = 'Lock In';
-	confirmButton.disabled = false;
 	switchSidesButton.style.display = 'none';
 	filterChampions();
 	colorBorder();

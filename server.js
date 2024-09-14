@@ -300,9 +300,9 @@ io.on('connection', (socket) => {
 					blueTeamName: draft.blueTeamName,
 					redTeamName: draft.redTeamName,
 				}
-				io.to(draftId).emit('showDraftResponse', draftData);
+				socket.emit('showDraftResponse', draftData);
 			} else {
-				io.to(draftId).emit('showDraftResponse', null);
+				socket.emit('showDraftResponse', null);
 			}
 		} catch (error) {
 			console.error('Error showing draft:', error);

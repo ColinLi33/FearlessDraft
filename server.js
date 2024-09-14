@@ -103,6 +103,7 @@ function checkFinishedDrafts() {
 	Object.keys(currStates).forEach((draftId) => {
 		if (!currStates[draftId].finished && isDraftFinished(draftId)) {
 			currStates[draftId].finished = true;
+            saveDraft(currStates[draftId], currStates[draftId].picks, currStates[draftId].fearlessBans, currStates[draftId].matchNumber, currStates[draftId].blueTeamName, currStates[draftId].redTeamName);
 			console.log(`Draft ${draftId} is finished.`);
 			delete currStates[draftId];
 		}

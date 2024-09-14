@@ -52,7 +52,7 @@ const draftSchema = new mongoose.Schema({
 	fearlessBans: [String],
 	matchNumber: Number,
 	blueTeamName: String,
-	redTeamName: String,
+	redTeamName: String
 });
 
 const Draft = mongoose.model('Draft', draftSchema);

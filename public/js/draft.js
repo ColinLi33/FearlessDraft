@@ -312,7 +312,6 @@ function lockChamp() { //lock in champ
 		});
         confirmButton.disabled = true;
 	}
-	currPick++;
     searchInput.value = '';
     selectedRole = '';
     roleIcons.forEach(icon => icon.classList.remove('active'));

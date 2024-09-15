@@ -316,7 +316,7 @@ function lockChamp() { //lock in champ
     selectedRole = '';
     roleIcons.forEach(icon => icon.classList.remove('active'));
     filterChampions();
-	if (currPick <= 20) {
+	if (currPick <= 19) {
 		colorBorder();
 		startTimer();
 	} else {

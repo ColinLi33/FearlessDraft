@@ -114,7 +114,7 @@ body {
 }
 
 .champion-icon:hover {
-    transform: scale(1.07);
+    transform: scale(1.05);
     z-index: 1;
   }
   

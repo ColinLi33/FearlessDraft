@@ -17,6 +17,7 @@ const championGrid = document.getElementById('champion-grid');
 const searchInput = document.getElementById('searchInput');
 const confirmButton = document.getElementById('confirmButton');
 const switchSidesButton = document.getElementById('switchSidesButton');
+const finishSeriesButton = document.getElementById('finishSeriesButton');
 const roleIcons = document.querySelectorAll('.role-icon');
 let selectedRole = '';
 let selectedChampion = null;
@@ -196,6 +197,9 @@ roleIcons.forEach(icon => {
 searchInput.addEventListener('input', filterChampions);
 
 confirmButton.addEventListener('click', () => { //lock in/ready button
+    if(viewingPreviousDraft){
+        return;
+    }
 	if (currPick === 0) {
 		if (side === 'S') {
 			return
@@ -330,6 +334,7 @@ function startDraft() {
 	document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
 	confirmButton.textContent = 'Lock In';
 	switchSidesButton.style.display = 'none';
+    finishSeriesButton.style.display = 'none';
 	displayChampions(champions);
 	colorBorder();
 	startTimer();
@@ -484,6 +489,13 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
 			switchSidesButton.onclick = function() {
 				socket.emit('switchSides', draftId);
 			};
+            finishSeriesButton.style.display = 'block';
+			finishSeriesButton.onclick = function() {
+				viewingPreviousDraft = true;
+                socket.emit('endSeries', draftId)
+                finishSeriesButton.style.display = 'none';
+                switchSidesButton.style.display = 'none';
+			};
 		}
 	}
 	if (blueReady && redReady) {
@@ -501,6 +513,7 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
 	if (side === 'S') {
 		confirmButton.style.display = 'none';
 		switchSidesButton.style.display = 'none';
+        finishSeriesButton.style.display = 'none';
 	}
 });
 
@@ -514,12 +527,15 @@ socket.on('pickUpdate', (picks) => { //new pick was locked
 
 socket.on('showNextGameButton', (data) => { //draft ended
 	if (data.finished) {
-		confirmButton.style.display = 'block';
+        viewingPreviousDraft = true;
 		confirmButton.textContent = 'View Previous Games';
+		confirmButton.style.display = 'block';
 		confirmButton.disabled = false;
 		confirmButton.onclick = function() {
 			location.reload();
 		};
+        switchSidesButton.style.display = 'none';
+        finishSeriesButton.style.display = 'none';
 		return;
 	}
 	currPick = 0;
@@ -530,6 +546,13 @@ socket.on('showNextGameButton', (data) => { //draft ended
 		switchSidesButton.onclick = function() {
 			socket.emit('switchSides', draftId);
 		};
+        finishSeriesButton.style.display = 'block';
+        finishSeriesButton.onclick = function() {
+            viewingPreviousDraft = true;
+            socket.emit('endSeries', draftId)
+            finishSeriesButton.style.display = 'none';
+            switchSidesButton.style.display = 'none';
+        };
 	}
 	blueReady = data.blueReady;
 	redReady = data.redReady;

@@ -54,7 +54,11 @@ const draftSchema = new mongoose.Schema({
 	fearlessBans: [String],
 	matchNumber: Number,
 	blueTeamName: String,
-	redTeamName: String
+	redTeamName: String,
+    date: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const Draft = mongoose.model('Draft', draftSchema);
@@ -72,6 +76,7 @@ async function saveDraft(draftId, picks, fearlessBans, matchNumber, blueTeamName
 			matchNumber,
 			blueTeamName,
 			redTeamName,
+            date: Date.now()
 		});
 		await draft.save();
 		console.log('Draft saved successfully');
@@ -280,6 +285,7 @@ io.on('connection', (socket) => {
 		}
 		io.to(draftId).emit('showNextGameButton', currStates[draftId]);
 	});
+    
 
 	socket.on('switchSides', (draftId) => { //switches sides 
 		if (currStates[draftId]) {
@@ -295,6 +301,12 @@ io.on('connection', (socket) => {
 			currStates[draftId].redTeamName = temp;
 			io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
 		}
+	});
+
+    socket.on('endSeries', (draftId) => { //ends draft
+		currStates[draftId].finished = true;
+		io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+        delete currStates[draftId];
 	});
 
 	socket.on('showDraft', async (draftId, gameNum) => { //shows draft

@@ -59,9 +59,6 @@ function preloadChampionImages() { //preload pick images
             const championImage = new Image();
             const championIcon = new Image();
             championImage.src = '/img/placeholder.png';
-            championIcon.style.width = '100%';
-            championIcon.style.height = 'auto';
-            championIcon.style.objectFit = 'contain';
             championIcon.src = '/img/placeholder.png';
             preloadedImages['none'] = championImage;
             preloadedIcons['none'] = championIcon;
@@ -177,6 +174,11 @@ function displayChampions(champions) { //display champion grid
 					const pickImage = pickSlot.querySelector('img');
 					pickImage.src = preloadedImages[champion.id].src;
 				}
+                if (selectedChampion) {
+                    selectedChampion.classList.remove('selected');
+                }
+                  // Add the 'selected' class to the clicked champion
+                championIcon.classList.add('selected');
 				selectedChampion = championIcon;
                 socket.emit('hover', {draftId, side: side, champion: champion.id});
 				confirmButton.disabled = false;

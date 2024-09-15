@@ -110,7 +110,19 @@ body {
     height: 75px;
     margin: 0px;
     cursor: pointer;
+    transition: transform 0.2s;
 }
+
+.champion-icon:hover {
+    transform: scale(1.07);
+    z-index: 1;
+  }
+  
+  .champion-icon.selected {
+    box-sizing: border-box;
+    border: 2px solid rgb(236, 209, 59);
+    z-index: 2;
+  }
 
 #champion-grid {
     display: grid;

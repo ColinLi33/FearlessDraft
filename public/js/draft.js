@@ -425,7 +425,7 @@ function updateSide(sideSwapped, blueName, redName, initialLoad = false) {
 		side = 'B'
 	} else if (sideSelect === 'red') {
 		side = 'R'
-	} else if (sideSelect === 'spectate') {
+	} else {
 		side = 'S'
 	}
 	document.getElementById('blue-team-name').textContent = blueName;

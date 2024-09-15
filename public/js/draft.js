@@ -178,6 +178,7 @@ function displayChampions(champions) { //display champion grid
 					pickImage.src = preloadedImages[champion.id].src;
 				}
 				selectedChampion = championIcon;
+                socket.emit('hover', {draftId, side: side, champion: champion.id});
 				confirmButton.disabled = false;
 			});
 		}
@@ -251,6 +252,16 @@ function colorBorder() { //shows who is picking currently
 	if (currSlot === "done") {
 		return;
 	}
+    if(currPick == 0){ //color border based on side
+        if (side === 'B') {
+            document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
+            document.querySelector('#red-side-header').style.border = '2px solid black';
+        } else if (side === 'R') {
+            document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
+            document.querySelector('#blue-side-header').style.border = '2px solid black';
+        }
+        return;
+    }
 	if (currSlot[0] === 'B') { //make border of blue-side-header gold
 		document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
 		document.querySelector('#red-side-header').style.border = '2px solid black';
@@ -394,6 +405,19 @@ function fearlessBan(champions) {
 	});
 }
 
+function hover(pick){
+    const slot = getCurrSlot(currPick);
+    if (slot[1] === 'B') {
+        const banSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-bans .ban-slot:nth-child(${slot[0] === 'B' ? slot[2] : 6-slot[2]})`);
+        const banImage = banSlot.querySelector('img');
+        banImage.src = preloadedIcons[pick].src;
+    } else {
+        const pickSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-picks .pick-slot:nth-child(${slot[2]})`);
+        const pickImage = pickSlot.querySelector('img');
+        pickImage.src = preloadedImages[pick].src;
+    }
+}
+
 function newPick(picks) {
 	picks.forEach((pick, index) => {
         if(pick == 'placeholder'){ //TODO remove this later, currently here for backward compatibility
@@ -531,6 +555,10 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
 
 socket.on('lockChamp', () => { //locks in champ
 	lockChamp();
+});
+
+socket.on('hover', (champion) => { //hovering over champ
+    hover(champion);
 });
 
 socket.on('pickUpdate', (picks) => { //new pick was locked

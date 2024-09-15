@@ -256,6 +256,10 @@ io.on('connection', (socket) => {
 		};
 		socket.emit('draftState', data);
 	});
+    
+    socket.on('hover', (data) => { //hovering over champ
+        socket.to(data.draftId).emit('hover', data.champion);
+    });
 
 	socket.on('pickSelection', (data) => { //new pick made
 		const {

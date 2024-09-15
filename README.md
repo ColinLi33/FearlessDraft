@@ -20,7 +20,7 @@ Fearless Draft Simulator is hosted at [fearlessdraft.net](https://www.fearlessdr
 
 ## Contributing
 
-I welcome contributions to enhance Fearless Draft. If you have any ideas, suggestions, or bug reports, please open an issue on the GitHub repository.
+I welcome contributions to enhance Fearless Draft. If you have any ideas, suggestions, or bug reports, please open an issue on the repo.
 
 ## Contact
 

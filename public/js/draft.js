@@ -425,7 +425,7 @@ function updateSide(sideSwapped, blueName, redName, initialLoad = false) {
 		side = 'B'
 	} else if (sideSelect === 'red') {
 		side = 'R'
-	} else if (sideSelect === 'spectator') {
+	} else if (sideSelect === 'spectate') {
 		side = 'S'
 	}
 	document.getElementById('blue-team-name').textContent = blueName;
@@ -482,7 +482,6 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
         viewingPreviousDraft = true;
 		socket.emit('showDraft', draftId, 1)
 		return;
-		//call showDraft
 	}
 	blueReady = data.blueReady;
 	redReady = data.redReady;

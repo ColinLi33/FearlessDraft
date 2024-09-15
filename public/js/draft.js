@@ -37,6 +37,7 @@ async function loadChamps() { //preload champion grid images
 					id: value.id,
 					key: value.key,
 				}));
+                champions.unshift({id: 'none', key: 'none'});
 				return fetch('/proxy/championrates');
 			})
 			.then(response => response.json())
@@ -54,6 +55,18 @@ async function loadChamps() { //preload champion grid images
 
 function preloadChampionImages() { //preload pick images
 	Object.keys(champions).forEach(championKey => {
+        if(championKey == 0){ //none placeholder icon
+            const championImage = new Image();
+            const championIcon = new Image();
+            championImage.src = '/img/placeholder.png';
+            championIcon.style.width = '100%';
+            championIcon.style.height = 'auto';
+            championIcon.style.objectFit = 'contain';
+            championIcon.src = '/img/placeholder.png';
+            preloadedImages['none'] = championImage;
+            preloadedIcons['none'] = championIcon;
+            return;
+        }
 		const champion = champions[championKey];
 		const championImage = new Image();
 		const championIcon = new Image();
@@ -82,7 +95,7 @@ function mergeRoleData(roleData) { //get role data for role filters
 			roleTest = roleTest.map(role => role.role);
 			champions[champ].roles = roleTest;
 		} else {
-			champ.roles = [];
+			champions[champ].roles = [];
 		}
 	});
 }
@@ -131,7 +144,11 @@ function displayChampions(champions) { //display champion grid
 		championIcon.src = preloadedIcons[champion.id].src;
 		championIcon.alt = champion.id;
 		championIcon.classList.add('champion-icon');
-		if (usedChamps.has(champion.id) || fearlessChamps.has(champion.id)) {
+        if(champion.id === 'none'){ //placeholder image for none pick
+            championIcon.style.objectFit = 'cover';
+            championIcon.style.objectPosition = 'center';
+        }
+		if (champion.id !== 'none' && (usedChamps.has(champion.id) || fearlessChamps.has(champion.id))) {
 			championIcon.classList.add('used');
 			championIcon.style.filter = 'grayscale(100%)';
             //remove event listener
@@ -308,7 +325,7 @@ function lockChamp() { //lock in champ
 	} else {
 		socket.emit('pickSelection', {
 			draftId,
-			pick: "placeholder"
+			pick: "none"
 		});
         confirmButton.disabled = true;
 	}
@@ -344,10 +361,9 @@ function fearlessBan(champions) {
 	blueCounter = 1;
 	redCounter = 1;
 	champions.forEach((pick, index) => {
-		if (pick == 'placeholder') {
-			fearlessBanSlot++;
-			return;
-		}
+        if(pick == 'placeholder'){ //TODO remove this later, currently here for backward compatibility
+            pick = 'none'
+        }
 		fearlessBanSlot = (index + 1) % 10;
 		let banSlot = null;
 		let banImage = null;
@@ -380,11 +396,9 @@ function fearlessBan(champions) {
 
 function newPick(picks) {
 	picks.forEach((pick, index) => {
-		if (pick == 'placeholder') {
-			currPick++;
-			colorBorder();
-			return; //TODO: is this ok
-		}
+        if(pick == 'placeholder'){ //TODO remove this later, currently here for backward compatibility
+            pick = 'none'
+        }
 		currPick = index + 1;
 		const slot = getCurrSlot(currPick);
 		if (slot[1] === 'B') {

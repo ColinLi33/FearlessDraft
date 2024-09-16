@@ -33,10 +33,13 @@ async function loadChamps() { //preload champion grid images
 			.then(response => response.json())
 			.then(data => {
 				champions = data.data;
+                champions['MonkeyKing'].id = 'Wukong'; //LOL!
 				champions = Object.entries(champions).map(([key, value]) => ({
 					id: value.id,
 					key: value.key,
 				}));
+                //sort chmapions by id
+                champions.sort((a, b) => a.id.localeCompare(b.id)); //TODO: maybe find faster way to do this
                 champions.unshift({id: 'none', key: 'none'});
 				return fetch('/proxy/championrates');
 			})
@@ -70,7 +73,10 @@ function preloadChampionImages() { //preload pick images
 		if (champion.id === 'Fiddlesticks') { //LOL!
 			championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/FiddleSticks_0.jpg`;
 			championIcon.src = `${baseUrl}/img/champion/Fiddlesticks.png`;
-		} else {
+		} else if(champion.id === 'Wukong'){
+            championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/MonkeyKing_0.jpg`;
+            championIcon.src = `${baseUrl}/img/champion/MonkeyKing.png`;
+        } else {
 			championImage.src = `https://ddragon.leagueoflegends.com/cdn/img/champion/centered/${champion.id}_0.jpg`;
 			championIcon.src = `${baseUrl}/img/champion/${champion.id}.png`;
 		}
@@ -173,6 +179,7 @@ function displayChampions(champions) { //display champion grid
 					}
 					const pickImage = pickSlot.querySelector('img');
 					pickImage.src = preloadedImages[champion.id].src;
+                    addChampionNameText(pickSlot, champion.id);
 				}
                 if (selectedChampion) {
                     selectedChampion.classList.remove('selected');
@@ -361,6 +368,7 @@ function startDraft() {
 	currPick = 1;
 	document.querySelectorAll('.ban-slot img').forEach(img => img.src = '/img/placeholder.png');
 	document.querySelectorAll('.pick-slot img').forEach(img => img.src = '/img/placeholder.png');
+    document.querySelectorAll('.champion-name').forEach(label => label.textContent = '');
 	confirmButton.textContent = 'Lock In';
 	switchSidesButton.style.display = 'none';
     finishSeriesButton.style.display = 'none';
@@ -417,13 +425,22 @@ function hover(pick){
         const pickSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-picks .pick-slot:nth-child(${slot[2]})`);
         const pickImage = pickSlot.querySelector('img');
         pickImage.src = preloadedImages[pick].src;
+        addChampionNameText(pickSlot, pick);
     }
+}
+
+function addChampionNameText(pickSlot, pick){
+    const championName = pickSlot.querySelector('.champion-name');
+    championName.textContent = pick;
 }
 
 function newPick(picks) {
 	picks.forEach((pick, index) => {
         if(pick == 'placeholder'){ //TODO remove this later, currently here for backward compatibility
             pick = 'none'
+        }
+        if(pick == 'MonkeyKing'){
+            pick = 'Wukong'; //LOL!
         }
 		currPick = index + 1;
 		const slot = getCurrSlot(currPick);
@@ -435,6 +452,8 @@ function newPick(picks) {
 			const pickSlot = document.querySelector(`#${slot[0] === 'B' ? 'blue' : 'red'}-picks .pick-slot:nth-child(${slot[2]})`);
 			const pickImage = pickSlot.querySelector('img');
 			pickImage.src = preloadedImages[pick].src;
+            //text that shows champion name
+            addChampionNameText(pickSlot, pick);
 		}
 		usedChamps.add(pick);
 		currPick++;

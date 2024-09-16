@@ -118,11 +118,11 @@ body {
     z-index: 1;
   }
   
-  .champion-icon.selected {
+.champion-icon.selected {
     box-sizing: border-box;
     border: 2px solid rgb(236, 209, 59);
     z-index: 2;
-  }
+}
 
 #champion-grid {
     display: grid;
@@ -157,12 +157,38 @@ body {
     width: 240px;
     height: 83px;
     border-radius: 4px;
-    display: flex;
+    position: relative;
+    display: inline-block;
     justify-content: center;
     align-items: center;
     font-size: 18px;
     margin-bottom: 5px;
     overflow: hidden;
+}
+.blue-side .champion-name {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    text-align: right;
+    padding: 2px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.red-side .champion-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    text-align: left;
+    padding: 2px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ban-slot {
@@ -177,6 +203,9 @@ body {
     overflow: hidden;
 }
 
+.pick-slot img:not([src$="/img/placeholder.png"]){
+    object-position: center 30%;
+}
 .pick-slot img,
 .ban-slot img,
 .fearless-ban-slot img {

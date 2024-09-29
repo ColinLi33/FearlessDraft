@@ -67,7 +67,7 @@
 
     // Function to copy all links to the clipboard
     function copyAllLinks(blueLink, redLink, spectatorLink) {
-      const links = `Blue Side Link: ${blueLink}\nRed Side Link: ${redLink}\nSpectator Link: ${spectatorLink}`;
+      const links = `Blue Link: ${blueLink}\nRed Link: ${redLink}\nSpec Link: ${spectatorLink}`;
       const tempTextarea = document.createElement('textarea');
       tempTextarea.value = links;
       document.body.appendChild(tempTextarea);

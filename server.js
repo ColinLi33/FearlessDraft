@@ -4,6 +4,7 @@ require('dotenv').config();
 const socketIO = require('socket.io');
 const fetch = require('node-fetch');
 const uuid = require('uuid');
+var { nanoid } = require('nanoid');
 const mongoose = require('mongoose');
 const NodeCache = require('node-cache');
 
@@ -154,7 +155,8 @@ app.post('/create-draft', (req, res) => {
 	const blueTeamName = req.body.blueTeamName;
 	const redTeamName = req.body.redTeamName;
 
-	const draftId = uuid.v4();
+	// const draftId = uuid.v4();
+    const draftId = nanoid();
 	const blueLink = `${domain}/draft/${draftId}/blue`;
 	const redLink = `${domain}/draft/${draftId}/red`;
 	const spectatorLink = `${domain}/draft/${draftId}/spectator`;

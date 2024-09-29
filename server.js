@@ -156,7 +156,7 @@ app.post('/create-draft', (req, res) => {
 	const redTeamName = req.body.redTeamName;
 
 	// const draftId = uuid.v4();
-    const draftId = nanoid();
+    const draftId = nanoid(8);
 	const blueLink = `${domain}/draft/${draftId}/blue`;
 	const redLink = `${domain}/draft/${draftId}/red`;
 	const spectatorLink = `${domain}/draft/${draftId}/spectator`;

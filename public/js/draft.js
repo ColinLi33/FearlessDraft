@@ -21,7 +21,8 @@ const finishSeriesButton = document.getElementById('finishSeriesButton');
 const roleIcons = document.querySelectorAll('.role-icon');
 let selectedRole = '';
 let selectedChampion = null;
-let viewingPreviousDraft = false
+let viewingPreviousDraft = false;
+let isLocking = false;
 
 function startTimer() {
 	socket.emit('startTimer', draftId);
@@ -329,8 +330,13 @@ function updateFearlessBanSlots() { //controls fearless bans
 }
 
 function lockChamp() { //lock in champ
+    if(isLocking){
+        return;
+    }
+    isLocking = true;
 	const currSlot = getCurrSlot();
 	if (currSlot[0] != side) {
+        isLocking = false;
 		return;
 	}
 	if (selectedChampion) {
@@ -362,6 +368,9 @@ function lockChamp() { //lock in champ
 		currPick = 0
 		endDraft();
 	}
+    setTimeout(() => {
+        isLocking = false;
+    }, 100);
 }
 
 function startDraft() {

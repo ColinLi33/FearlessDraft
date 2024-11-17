@@ -172,7 +172,8 @@ app.post('/create-draft', (req, res) => {
 		matchNumber: 1,
 		sideSwapped: false,
 		finished: false,
-		lastActivity: Date.now()
+		lastActivity: Date.now(),
+        isLocking: false
 	};
 	res.json({
 		blueLink,
@@ -230,7 +231,11 @@ io.on('connection', (socket) => {
 			if (timeLeft <= -3) {
 				clearInterval(currStates[draftId].timer);
 				currStates[draftId].timer = null;
-				io.to(draftId).emit('lockChamp');
+                setTimeout(() => {
+                    if (!currStates[draftId].isLocking) {
+                      io.to(draftId).emit('lockChamp');
+                    }
+                }, 100);
 			}
 		}, 1000);
 	});
@@ -264,14 +269,18 @@ io.on('connection', (socket) => {
     });
 
 	socket.on('pickSelection', (data) => { //new pick made
-		const {
-			draftId,
-			pick
-		} = data;
+		const {draftId, pick} = data;
+        if(currStates[draftId].isLocking) {
+            return;
+        }
+        currStates[draftId].isLocking = true;
 		currStates[draftId].lastActivity = Date.now();
 		if (currStates[draftId]) {
 			currStates[draftId].picks.push(pick);
 			io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
+            setTimeout(() => {
+                currStates[draftId].isLocking = false;
+            }, 100);
 		}
 	});
 

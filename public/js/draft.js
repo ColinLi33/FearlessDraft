@@ -258,11 +258,19 @@ function colorBorder() { //shows who is picking currently
     if(viewingPreviousDraft){
         return;
     }
-	let currSlot = getCurrSlot();
-	if (currSlot === "done") {
-		return;
-	}
-    if(currPick == 0){ //color border based on side
+    let currSlot = getCurrSlot();
+    if (currSlot === "done") {
+        return;
+    }
+    // Reset the border for all side headers and slots
+    document.querySelectorAll('.side-header').forEach(header => {
+        header.style.border = '2px solid black';
+    });
+    document.querySelectorAll('.pick-slot, .ban-slot').forEach(slot => {
+        slot.style.border = 'none'; // Reset the border of all slots
+    });
+
+    if(currPick == 0){ // color border based on side
         if (side === 'B') {
             document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
             document.querySelector('#red-side-header').style.border = '2px solid black';
@@ -272,14 +280,33 @@ function colorBorder() { //shows who is picking currently
         }
         return;
     }
-	if (currSlot[0] === 'B') { //make border of blue-side-header gold
-		document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
-		document.querySelector('#red-side-header').style.border = '2px solid black';
-	} else {
-		document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
-		document.querySelector('#blue-side-header').style.border = '2px solid black';
-	}
+    // Apply a golden border to the current side's header
+    if (currSlot[0] === 'B') {
+        document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
+        document.querySelector('#red-side-header').style.border = '2px solid black';
+    } else {
+        document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
+        document.querySelector('#blue-side-header').style.border = '2px solid black';
+    }
+
+    // Highlight the current pick/ban slot
+    let pickOrBanSlot = null;
+    if (currSlot[1] === 'B') { //ban
+        pickOrBanSlot = document.querySelector(`#blue-bans .ban-slot:nth-child(${currSlot[2]})`);
+        if (currSlot[0] === 'R') { //red side ban
+            pickOrBanSlot = document.querySelector(`#red-bans .ban-slot:nth-child(${6-currSlot[2]})`);
+        }
+    } else { //pick
+        pickOrBanSlot = document.querySelector(`#blue-picks .pick-slot:nth-child(${currSlot[2]})`);
+        if (currSlot[0] === 'R') { //red side ban
+            pickOrBanSlot = document.querySelector(`#red-picks .pick-slot:nth-child(${currSlot[2]})`);
+        }
+    }
+    if (pickOrBanSlot) {
+        pickOrBanSlot.style.border = '2px solid rgb(236, 209, 59)'; // Golden border for the current pick or ban slot
+    }
 }
+
 
 
 function updateFearlessBanSlots() { //controls fearless bans

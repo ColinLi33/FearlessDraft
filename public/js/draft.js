@@ -337,7 +337,9 @@ function updateFearlessBanSlots() { //controls fearless bans
 			rightMargin = 204;
 			break;
 		case 5:
-			fearlessBansPerSide = 0;
+			fearlessBansPerSide = 20;
+			leftMargin = 360;
+			rightMargin = 354;
 			break;
 		default:
 			fearlessBansPerSide = 0;
@@ -513,20 +515,23 @@ function updateSide(sideSwapped, blueName, redName, initialLoad = false) {
 	document.getElementById('red-team-name').textContent = redName;
 	if (!sideSwapped) {
 		if (!initialLoad)
-            if(side !== 'S')
-			    alert(`You are now on ${side}`);
-            else
+            if(side !== 'S'){
+                if(side === 'B')
+                    alert('You are now on Blue Side');
+                else if(side === 'R')
+                    alert('You are now on Red Side');
+            } else
                 alert(`Sides Swapped`);
 		return
 	}
 	if (side === 'B') {
 		side = 'R';
 		if (!initialLoad)
-			alert(`You are now on ${side}`);
+			alert('You are now on Red Side');
 	} else if (side === 'R') {
 		side = 'B';
 		if (!initialLoad)
-			alert(`You are now on ${side}`);
+			alert('You are now on Blue Side');
 	}
 	document.getElementById('blue-team-name').textContent = blueName;
 	document.getElementById('red-team-name').textContent = redName;

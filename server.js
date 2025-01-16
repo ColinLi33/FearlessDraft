@@ -138,9 +138,13 @@ app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
 
 app.get('/draft/:draftId/:side', (req, res) => {
 	const draftId = req.params.draftId;
-	const side = req.params.side;
-	const blueTeamName = currStates[draftId]?.blueTeamName || 'Blue';
-	const redTeamName = currStates[draftId]?.redTeamName || 'Red';
+    const teamId = req.params.side;
+    let side = 'blue'
+    if(teamId == 'team2'){
+        side = 'red'
+    }
+	const blueTeamName = currStates[draftId]?.blueTeamName || 'Team 1';
+	const redTeamName = currStates[draftId]?.redTeamName || 'Team 2';
 
 	res.render('draft', {
 		draftId,
@@ -157,8 +161,8 @@ app.post('/create-draft', (req, res) => {
 
 	// const draftId = uuid.v4();
     const draftId = nanoid(8);
-	const blueLink = `${domain}/draft/${draftId}/blue`;
-	const redLink = `${domain}/draft/${draftId}/red`;
+	const blueLink = `${domain}/draft/${draftId}/team1`;
+	const redLink = `${domain}/draft/${draftId}/team2`;
 	const spectatorLink = `${domain}/draft/${draftId}/spectator`;
 	currStates[draftId] = {
 		blueTeamName: blueTeamName,
@@ -295,7 +299,7 @@ io.on('connection', (socket) => {
 		saveDraft(draftId, currStates[draftId].picks, currStates[draftId].fearlessBans, currStates[draftId].matchNumber, currStates[draftId].blueTeamName, currStates[draftId].redTeamName);
 		currStates[draftId].matchNumber++;
 		currStates[draftId].lastActivity = Date.now();
-		if (currStates[draftId].matchNumber >= 5) { //5 games total
+		if (currStates[draftId].matchNumber > 5) { //5 games total
 			currStates[draftId].finished = true;
 		}
 		io.to(draftId).emit('showNextGameButton', currStates[draftId]);

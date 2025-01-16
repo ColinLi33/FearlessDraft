@@ -267,7 +267,7 @@ function colorBorder() { //shows who is picking currently
         header.style.border = '2px solid black';
     });
     document.querySelectorAll('.pick-slot, .ban-slot').forEach(slot => {
-        slot.style.border = 'none'; // Reset the border of all slots
+        slot.style.outline = 'none'; // Reset the border of all slots
     });
 
     if(currPick == 0){ // color border based on side
@@ -303,7 +303,7 @@ function colorBorder() { //shows who is picking currently
         }
     }
     if (pickOrBanSlot) {
-        pickOrBanSlot.style.border = '2px solid rgb(236, 209, 59)'; // Golden border for the current pick or ban slot
+        pickOrBanSlot.style.outline = '2px solid rgb(236, 209, 59)'; // Golden outline for the current pick or ban slot
     }
 }
 

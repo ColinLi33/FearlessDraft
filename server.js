@@ -201,6 +201,10 @@ io.on('connection', (socket) => {
 			draftId,
 			side
 		} = data;
+        if(!currStates[draftId]){
+            io.to(draftId).emit('draftNotAvailable');
+            return;
+        }
 		if (side === 'blue') {
 			currStates[draftId].blueReady = true;
 		} else if (side === 'red') {

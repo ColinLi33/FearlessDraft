@@ -669,6 +669,11 @@ socket.on('switchSidesResponse', (data) => { //sides swapped
 	updateSide(data.sideSwapped, data.blueTeamName, data.redTeamName);
 });
 
+socket.on('draftNotAvailable', () => {
+    alert('Draft not available please make a new one.');
+    window.location.href = '/';
+});
+
 socket.on('showDraftResponse', (data) => {
 	if (!data) {
 		alert("No more games to show!")

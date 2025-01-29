@@ -8,7 +8,7 @@ Fearless Draft Simulator is hosted at [fearlessdraft.net](https://www.fearlessdr
 
 ## Features
 
-- Supports full fearless drafting for up to 4 games.
+- Supports full fearless drafting for up to 5 games.
 - Stores all previous drafts in a database for future reference.
 
 ## How to Use

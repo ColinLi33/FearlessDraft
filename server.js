@@ -12,8 +12,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const cache = new NodeCache({ stdTTL: 86400 }); // Cache for 1 day
-// const domain = 'https://www.fearlessdraft.net';
-const domain = 'http://localhost:3333';
+const domain = 'https://www.fearlessdraft.net';
+// const domain = 'http://localhost:3333';
 
 const currStates = {};
 

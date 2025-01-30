@@ -315,8 +315,38 @@ function updateFearlessBanSlots() { //controls fearless bans
 	const blueFearlessBansDiv = document.querySelector('#blue-fearless-bans');
 	const redFearlessBansDiv = document.querySelector('#red-fearless-bans');
 
-	fearlessBansPerSide = (matchNumber-1)*5; //should be simpler than using switch and case unless matchNumber can go above 5
-
+	switch (matchNumber) {
+		case 1:
+			fearlessBansPerSide = 0;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+		case 2:
+			fearlessBansPerSide = 5;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+		case 3:
+			fearlessBansPerSide = 10;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+		case 4:
+			fearlessBansPerSide = 15;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+		case 5:
+			fearlessBansPerSide = 20;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+		default:
+			fearlessBansPerSide = 0;
+			leftMargin = 0;
+			rightMargin = 0;
+			break;
+	}
 	blueFearlessBanSlots.forEach((slot, index) => {
 		slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
 	});
@@ -324,6 +354,8 @@ function updateFearlessBanSlots() { //controls fearless bans
 	redFearlessBanSlots.forEach((slot, index) => {
 		slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
 	});
+	blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
+	redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
 }
 
 function lockChamp() { //lock in champ

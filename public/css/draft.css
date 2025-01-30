@@ -6,12 +6,12 @@ body {
 .draft-container {
     display: flex;
     justify-content: space-between;
-    margin: 20px;
+    margin: 20px 5px;
 }
 
 .champion-pool-container {
     flex-grow: 1;
-    margin: 0 20px;
+    margin: 0 0px;
     display: flex;
     flex-direction: column;
 }
@@ -39,7 +39,7 @@ body {
 
 .blue-side-header {
     margin-right: 20px;
-    margin-left: 20px;
+    margin-left: 0px;
     margin-top: 0px;
     margin-bottom: 5px;
     height: 40px;
@@ -52,7 +52,7 @@ body {
 }
 
 .red-side-header {
-    margin-right: 20px;
+    margin-right: 0px;
     margin-left: 20px;
     margin-top: 0px;
     margin-bottom: 5px;
@@ -131,31 +131,36 @@ body {
     justify-items: center;
 }
 
-.blue-side,
-.red-side {
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.blue-side {
+  width: 245px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /*<---------*/
 }
 
+.red-side {
+  width: 245px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /*<---------*/
+}
 #blue-bans {
     display: flex;
     justify-content: flex-start;
     margin-top: 3px;
-    margin-left: 35px;
+    margin-left: 0px;
 }
 
 #red-bans {
     display: flex;
     justify-content: flex-end;
     margin-top: 3px;
-    margin-right: 19px;
+    margin-right: -10px;
 }
 
 .pick-slot {
     width: 240px;
-    height: 83px;
+    height: 85px;
     border-radius: 4px;
     position: relative;
     display: inline-block;
@@ -274,4 +279,14 @@ body {
     font-size: 16px;
     background-color: rgb(236, 209, 59);
     border: 0;
+}
+
+#blue-picks {
+    display:flex;
+    flex-direction: column;
+}
+
+#red-picks {
+    display: flex;
+    flex-direction: column;
 }

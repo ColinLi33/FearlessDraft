@@ -12,8 +12,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const cache = new NodeCache({ stdTTL: 86400 }); // Cache for 1 day
-const domain = 'https://www.fearlessdraft.net';
-// const domain = 'http://localhost:3333';
+// const domain = 'https://www.fearlessdraft.net';
+const domain = 'http://localhost:3333';
 
 const currStates = {};
 
@@ -139,8 +139,10 @@ app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
 app.get('/draft/:draftId/:side', (req, res) => {
 	const draftId = req.params.draftId;
     const teamId = req.params.side;
-    let side = 'blue'
-    if(teamId == 'team2'){
+    let side = 'spectator'
+    if(teamId == 'team1'){
+        side = 'blue'
+    } else if(teamId == 'team2'){
         side = 'red'
     }
 	const blueTeamName = currStates[draftId]?.blueTeamName || 'Team 1';
@@ -278,7 +280,12 @@ io.on('connection', (socket) => {
 
 	socket.on('pickSelection', (data) => { //new pick made
 		const {draftId, pick} = data;
-        if(currStates[draftId].isLocking) {
+        try{
+            if(currStates[draftId].isLocking) {
+                return;
+            }
+        } catch {
+            console.log("Pick selection error:",currStates[draftId])
             return;
         }
         currStates[draftId].isLocking = true;

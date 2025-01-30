@@ -323,23 +323,23 @@ function updateFearlessBanSlots() { //controls fearless bans
 			break;
 		case 2:
 			fearlessBansPerSide = 5;
-			leftMargin = -90;
-			rightMargin = -96;
+			leftMargin = 0;
+			rightMargin = 0;
 			break;
 		case 3:
 			fearlessBansPerSide = 10;
-			leftMargin = 60;
-			rightMargin = 54;
+			leftMargin = 0;
+			rightMargin = 0;
 			break;
 		case 4:
 			fearlessBansPerSide = 15;
-			leftMargin = 210;
-			rightMargin = 204;
+			leftMargin = 0;
+			rightMargin = 0;
 			break;
 		case 5:
 			fearlessBansPerSide = 20;
-			leftMargin = 360;
-			rightMargin = 354;
+			leftMargin = 0;
+			rightMargin = 0;
 			break;
 		default:
 			fearlessBansPerSide = 0;

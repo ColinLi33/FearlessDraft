@@ -24,21 +24,6 @@ let selectedChampion = null;
 let viewingPreviousDraft = false;
 let isLocking = false;
 
-//Dynamically fetching the CSS style for the hover and selection borders from draft.css
-//by instantiating a dummy div, assigning it a CSS style, then grabbing the border data as a 
-//string for use in colorBorder()
-const tempElement = document.createElement('div');
-document.body.appendChild(tempElement); // Append temporarily to get computed styles
-function fetchOutlineTempElement(className) { //Returns the CSS outline string from a CSS className in draft.css
-	tempElement.classList.value = ""; //clear all currently attached classes
-	tempElement.classList.add(className);
-	return getComputedStyle(tempElement).outline;
-}
-const headerSelectOutline = fetchOutlineTempElement('header-select-outline');
-const headerDefaultOutline = fetchOutlineTempElement('header-default-outline');
-const pickChampOutline = fetchOutlineTempElement('pick-champ-outline');
-// Remove the temp element after fetching the styles
-document.body.removeChild(tempElement);
 
 
 function startTimer() {
@@ -271,7 +256,24 @@ confirmButton.addEventListener('click', () => { //lock in/ready button
 	}
 });
 
+const tempElement = document.createElement('div');
+document.body.appendChild(tempElement); // Append temporarily to get computed styles
+function fetchOutlineTempElement(className) { //Returns the CSS outline string from a CSS className in draft.css
+	//Dynamically fetching the CSS style for the hover and selection borders from draft.css
+	//by instantiating a dummy div, assigning it a CSS style, then grabbing the border data as a 
+	//string for use in colorBorder()
+	tempElement.classList.value = ""; //clear all currently attached classes
+	tempElement.classList.add(className);
+	return getComputedStyle(tempElement).outline;
+}
+
 function colorBorder() { //shows who is picking currently
+	document.body.appendChild(tempElement);
+	let headerSelectOutline = fetchOutlineTempElement('header-select-outline');
+	let headerDefaultOutline = fetchOutlineTempElement('header-default-outline');
+	let pickChampOutline = fetchOutlineTempElement('pick-champ-outline');
+	document.body.removeChild(tempElement);
+
     if(viewingPreviousDraft){
         return;
     }

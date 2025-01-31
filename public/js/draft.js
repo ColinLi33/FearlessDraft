@@ -24,6 +24,23 @@ let selectedChampion = null;
 let viewingPreviousDraft = false;
 let isLocking = false;
 
+//Dynamically fetching the CSS style for the hover and selection borders from draft.css
+//by instantiating a dummy div, assigning it a CSS style, then grabbing the border data as a 
+//string for use in colorBorder()
+const tempElement = document.createElement('div');
+document.body.appendChild(tempElement); // Append temporarily to get computed styles
+function fetchOutlineTempElement(className) { //Returns the CSS outline string from a CSS className in draft.css
+	tempElement.classList.value = ""; //clear all currently attached classes
+	tempElement.classList.add(className);
+	return getComputedStyle(tempElement).outline;
+}
+const headerSelectOutline = fetchOutlineTempElement('header-select-outline');
+const headerDefaultOutline = fetchOutlineTempElement('header-default-outline');
+const pickChampOutline = fetchOutlineTempElement('pick-champ-outline');
+// Remove the temp element after fetching the styles
+document.body.removeChild(tempElement);
+
+
 function startTimer() {
 	socket.emit('startTimer', draftId);
 }
@@ -264,7 +281,7 @@ function colorBorder() { //shows who is picking currently
     }
     // Reset the border for all side headers and slots
     document.querySelectorAll('.side-header').forEach(header => {
-        header.style.border = '2px solid black';
+        header.style.border = headerDefaultOutline;
     });
     document.querySelectorAll('.pick-slot, .ban-slot').forEach(slot => {
         slot.style.outline = 'none'; // Reset the border of all slots
@@ -272,21 +289,21 @@ function colorBorder() { //shows who is picking currently
 
     if(currPick == 0){ // color border based on side
         if (side === 'B') {
-            document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
-            document.querySelector('#red-side-header').style.border = '2px solid black';
+            document.querySelector('#blue-side-header').style.border = headerSelectOutline;
+            document.querySelector('#red-side-header').style.border = headerDefaultOutline;
         } else if (side === 'R') {
-            document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
-            document.querySelector('#blue-side-header').style.border = '2px solid black';
+            document.querySelector('#red-side-header').style.border = headerSelectOutline;
+            document.querySelector('#blue-side-header').style.border = headerDefaultOutline;
         }
         return;
     }
     // Apply a golden border to the current side's header
     if (currSlot[0] === 'B') {
-        document.querySelector('#blue-side-header').style.border = '2px solid rgb(236, 209, 59)';
-        document.querySelector('#red-side-header').style.border = '2px solid black';
+        document.querySelector('#blue-side-header').style.border = headerSelectOutline;
+        document.querySelector('#red-side-header').style.border = headerDefaultOutline;
     } else {
-        document.querySelector('#red-side-header').style.border = '2px solid rgb(236, 209, 59)';
-        document.querySelector('#blue-side-header').style.border = '2px solid black';
+        document.querySelector('#red-side-header').style.border = headerSelectOutline;
+        document.querySelector('#blue-side-header').style.border = headerDefaultOutline;
     }
 
     // Highlight the current pick/ban slot
@@ -303,7 +320,7 @@ function colorBorder() { //shows who is picking currently
         }
     }
     if (pickOrBanSlot) {
-        pickOrBanSlot.style.outline = '2px solid rgb(236, 209, 59)'; // Golden outline for the current pick or ban slot
+        pickOrBanSlot.style.outline = pickChampOutline; // Golden outline for the current pick or ban slot
     }
 }
 

@@ -337,33 +337,21 @@ function updateFearlessBanSlots() { //controls fearless bans
 	switch (matchNumber) {
 		case 1:
 			fearlessBansPerSide = 0;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 		case 2:
 			fearlessBansPerSide = 5;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 		case 3:
 			fearlessBansPerSide = 10;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 		case 4:
 			fearlessBansPerSide = 15;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 		case 5:
 			fearlessBansPerSide = 20;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 		default:
 			fearlessBansPerSide = 0;
-			leftMargin = 0;
-			rightMargin = 0;
 			break;
 	}
 	blueFearlessBanSlots.forEach((slot, index) => {
@@ -373,8 +361,8 @@ function updateFearlessBanSlots() { //controls fearless bans
 	redFearlessBanSlots.forEach((slot, index) => {
 		slot.style.display = index < fearlessBansPerSide ? 'flex' : 'none';
 	});
-	blueFearlessBansDiv.style.marginLeft = `${leftMargin}px`;
-	redFearlessBansDiv.style.marginRight = `${rightMargin}px`;
+	// blueFearlessBansDiv.style.marginLeft = '0px';
+	// redFearlessBansDiv.style.marginRight = `-4px`;
 }
 
 function lockChamp() { //lock in champ

@@ -231,7 +231,7 @@ body {
     display: flex;
     justify-content: flex-end;
     margin-top: 7px;
-    margin-right: -5px;
+    margin-right: -4px;
 }
 
 #blue-fearless-bans::before,

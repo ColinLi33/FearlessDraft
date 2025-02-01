@@ -334,9 +334,11 @@ io.on('connection', (socket) => {
 	});
 
     socket.on('endSeries', (draftId) => { //ends draft
-		currStates[draftId].finished = true;
-		io.to(draftId).emit('showNextGameButton', currStates[draftId]);
-        delete currStates[draftId];
+        if(currStates[draftId]){
+            currStates[draftId].finished = true;
+            io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+            delete currStates[draftId];
+        }
 	});
 
 	socket.on('showDraft', async (draftId, gameNum) => { //shows draft

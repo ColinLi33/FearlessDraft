@@ -224,14 +224,14 @@ body {
     display: flex;
     justify-content: flex-start;
     margin-top: 7px;
-    margin-left: 60px;
+    margin-left: 0px;
 }
 
 #red-fearless-bans {
     display: flex;
     justify-content: flex-end;
     margin-top: 7px;
-    margin-right: 54px;
+    margin-right: -5px;
 }
 
 #blue-fearless-bans::before,
@@ -289,4 +289,17 @@ body {
 #red-picks {
     display: flex;
     flex-direction: column;
+}
+
+/*
+    Change the color, thickness, etc. of the champion hover outlines, and the header outlines
+*/
+.pick-champ-outline {
+    outline: 2px solid rgb(236, 209, 59); /*default 2px solid rgb(236, 209, 59)*/
+}
+.header-select-outline {
+    outline: 2px solid rgb(236, 209, 59); /* default 2px solid rgb(236, 209, 59)*/
+}
+.header-default-outline {
+    outline: 2px solid black; /*default 2px solid black*/
 }

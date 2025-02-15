@@ -31,32 +31,36 @@ function startTimer() {
 }
 
 async function loadChamps() { //preload champion grid images
-	return new Promise((resolve, reject) => {
-		fetch(`${baseUrl}/data/en_US/champion.json`)
-			.then(response => response.json())
-			.then(data => {
-				champions = data.data;
-                champions['MonkeyKing'].id = 'Wukong'; //LOL!
-				champions = Object.entries(champions).map(([key, value]) => ({
-					id: value.id,
-					key: value.key,
-				}));
-                //sort chmapions by id
-                champions.sort((a, b) => a.id.localeCompare(b.id)); //TODO: maybe find faster way to do this
-                champions.unshift({id: 'none', key: 'none'});
-				return fetch('/proxy/championrates');
-			})
-			.then(response => response.json())
-			.then(data => {
-				roleData = data;
-				mergeRoleData(roleData.data);
-				resolve();
-			})
-			.catch(error => {
-				console.error('Error fetching data:', error);
-				reject(error);
-			});
-	});
+    try{
+        return new Promise((resolve, reject) => {
+            fetch(`${baseUrl}/data/en_US/champion.json`)
+                .then(response => response.json())
+                .then(data => {
+                    champions = data.data;
+                    champions['MonkeyKing'].id = 'Wukong'; //LOL!
+                    champions = Object.entries(champions).map(([key, value]) => ({
+                        id: value.id,
+                        key: value.key,
+                    }));
+                    //sort chmapions by id
+                    champions.sort((a, b) => a.id.localeCompare(b.id)); //TODO: maybe find faster way to do this
+                    champions.unshift({id: 'none', key: 'none'});
+                    return fetch('/proxy/championrates');
+                })
+                .then(response => response.json())
+                .then(data => {
+                    roleData = data;
+                    mergeRoleData(roleData.data);
+                    resolve();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    reject(error);
+                });
+        });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
 }
 
 function preloadChampionImages() { //preload pick images

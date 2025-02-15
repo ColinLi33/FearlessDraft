@@ -21,9 +21,15 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
 
+function log(message) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${message}`);
+}
+
 app.get('/', (req, res) => {
 	res.render('index');
 });
+
 const mongoUser = process.env.mongoUser;
 const mongoPass = process.env.mongoPass;
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@fearlessdraft.roz4r.mongodb.net/?retryWrites=true&w=majority&appName=FearlessDraft`;
@@ -41,10 +47,10 @@ async function run() {
 		await mongoose.connection.db.admin().command({
 			ping: 1
 		});
-		console.log("Connected To MongoDB");
+		log("Connected To MongoDB");
 	} catch (error) {
 		// Ensures that the client will close when you finish/error
-		console.error("Error connecting to MongoDB", error);
+		log("Error connecting to MongoDB", error);
 	}
 }
 run().catch(console.dir);
@@ -80,9 +86,9 @@ async function saveDraft(draftId, picks, fearlessBans, matchNumber, blueTeamName
             date: Date.now()
 		});
 		await draft.save();
-		console.log('Draft saved successfully');
+		log('Draft saved successfully');
 	} catch (error) {
-		console.error('Error saving draft:', error);
+		log('Error saving draft:', error);
 	}
 }
 
@@ -94,8 +100,7 @@ async function getDraft(draftId, matchNumber) {
 		});
 		return draft;
 	} catch (error) {
-		console.error('Error retrieving draft:', error);
-		throw error;
+		log('Error retrieving draft:', error);
 	}
 }
 
@@ -108,13 +113,17 @@ function isDraftFinished(draftId) {
 }
 
 function checkFinishedDrafts() {
-	Object.keys(currStates).forEach((draftId) => {
-		if (!currStates[draftId].finished && isDraftFinished(draftId)) {
-			currStates[draftId].finished = true;
-			console.log(`Draft ${draftId} is finished.`);
-			delete currStates[draftId];
-		}
-	});
+    try{
+        Object.keys(currStates).forEach((draftId) => {
+            if (!currStates[draftId].finished && isDraftFinished(draftId)) {
+                currStates[draftId].finished = true;
+                log(`Draft ${draftId} is finished.`);
+                delete currStates[draftId];
+            }
+        });
+    } catch (error) {
+        log('Error checking finished drafts:', error);
+    }
 }
 
 app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
@@ -129,7 +138,7 @@ app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
         cache.set(cacheKey, data);
 		res.json(data);
 	} catch (error) {
-		console.error('Error fetching data:', error);
+		log('Error fetching data:', error);
 		res.status(500).json({
 			error: 'Failed to fetch data'
 		});
@@ -137,55 +146,65 @@ app.get('/proxy/championrates', async (req, res) => { //TODO: cache later
 });
 
 app.get('/draft/:draftId/:side', (req, res) => {
-	const draftId = req.params.draftId;
-    const teamId = req.params.side;
-    let side = 'spectator'
-    if(teamId == 'team1'){
-        side = 'blue'
-    } else if(teamId == 'team2'){
-        side = 'red'
-    }
-	const blueTeamName = currStates[draftId]?.blueTeamName || 'Team 1';
-	const redTeamName = currStates[draftId]?.redTeamName || 'Team 2';
+    try{
+        const draftId = req.params.draftId;
+        const teamId = req.params.side;
+        let side = 'spectator'
+        if(teamId == 'team1'){
+            side = 'blue'
+        } else if(teamId == 'team2'){
+            side = 'red'
+        }
+        const blueTeamName = currStates[draftId]?.blueTeamName || 'Team 1';
+        const redTeamName = currStates[draftId]?.redTeamName || 'Team 2';
 
-	res.render('draft', {
-		draftId,
-		side,
-		blueTeamName,
-		redTeamName
-	});
+        res.render('draft', {
+            draftId,
+            side,
+            blueTeamName,
+            redTeamName
+        });
+    } catch (error) {
+        log(`Error rendering draft: ${error.message}`);
+        res.status(500).json({ error: 'Failed to render draft' });
+    }
 });
 
 
 app.post('/create-draft', (req, res) => {
-	const blueTeamName = req.body.blueTeamName;
-	const redTeamName = req.body.redTeamName;
+    try{
+        const blueTeamName = req.body.blueTeamName;
+        const redTeamName = req.body.redTeamName;
+        const draftId = nanoid(8);
+        const blueLink = `${domain}/draft/${draftId}/team1`;
+        const redLink = `${domain}/draft/${draftId}/team2`;
+        const spectatorLink = `${domain}/draft/${draftId}/spectator`;
+        currStates[draftId] = {
+            blueTeamName: blueTeamName,
+            redTeamName: redTeamName,
+            blueReady: false,
+            redReady: false,
+            picks: [],
+            fearlessBans: [],
+            timer: null,
+            started: false,
+            matchNumber: 1,
+            sideSwapped: false,
+            finished: false,
+            lastActivity: Date.now(),
+            isLocking: false
+        };
+        log(`Draft created: ${draftId} | Blue Team: ${blueTeamName} | Red Team: ${redTeamName}`);
 
-	// const draftId = uuid.v4();
-    const draftId = nanoid(8);
-	const blueLink = `${domain}/draft/${draftId}/team1`;
-	const redLink = `${domain}/draft/${draftId}/team2`;
-	const spectatorLink = `${domain}/draft/${draftId}/spectator`;
-	currStates[draftId] = {
-		blueTeamName: blueTeamName,
-		redTeamName: redTeamName,
-		blueReady: false,
-		redReady: false,
-		picks: [],
-		fearlessBans: [],
-		timer: null,
-		started: false,
-		matchNumber: 1,
-		sideSwapped: false,
-		finished: false,
-		lastActivity: Date.now(),
-        isLocking: false
-	};
-	res.json({
-		blueLink,
-		redLink,
-		spectatorLink
-	});
+        res.json({
+            blueLink,
+            redLink,
+            spectatorLink
+        });
+    } catch (error) {
+        log(`Error creating draft: ${error.message}`);
+        res.status(500).json({ error: 'Failed to create draft' });
+    }
 });
 
 
@@ -194,150 +213,178 @@ io.on('connection', (socket) => {
 		try {
 			socket.join(draftId);
 		} catch (error) {
-			console.error('Error joining draft:', error);
+			log('Error joining draft:', error);
 		}
 	});
 
 	socket.on('playerReady', (data) => {
-		const {
-			draftId,
-			side
-		} = data;
-        if(!currStates[draftId]){
-            io.to(draftId).emit('draftNotAvailable');
-            return;
+        try{
+            const {
+                draftId,
+                side
+            } = data;
+            if(!currStates[draftId]){
+                io.to(draftId).emit('draftNotAvailable');
+                return;
+            }
+            if (side === 'blue') {
+                currStates[draftId].blueReady = true;
+            } else if (side === 'red') {
+                currStates[draftId].redReady = true;
+            }
+            currStates[draftId].lastActivity = Date.now();
+            if (currStates[draftId].blueReady && currStates[draftId].redReady) {
+                if (!currStates[draftId].fearlessBans) {
+                    currStates[draftId].fearlessBans = []
+                }
+                currStates[draftId].fearlessBans = currStates[draftId].fearlessBans.concat(currStates[draftId].picks.slice(6, 12)).concat(currStates[draftId].picks.slice(16, 20));
+                currStates[draftId].picks = []
+                currStates[draftId].started = true;
+                io.to(draftId).emit('startDraft', currStates[draftId]);
+            }
+        } catch (error) {
+            log(`Error setting player ready: ${error.message}`);
         }
-		if (side === 'blue') {
-			currStates[draftId].blueReady = true;
-		} else if (side === 'red') {
-			currStates[draftId].redReady = true;
-		}
-		currStates[draftId].lastActivity = Date.now();
-		if (currStates[draftId].blueReady && currStates[draftId].redReady) {
-			if (!currStates[draftId].fearlessBans) {
-				currStates[draftId].fearlessBans = []
-			}
-			currStates[draftId].fearlessBans = currStates[draftId].fearlessBans.concat(currStates[draftId].picks.slice(6, 12)).concat(currStates[draftId].picks.slice(16, 20));
-			currStates[draftId].picks = []
-			currStates[draftId].started = true;
-			io.to(draftId).emit('startDraft', currStates[draftId]);
-		}
 	});
 
 	socket.on('startTimer', (data) => {
-		const draftId = data;
-		currStates[draftId].started = true;
-		currStates[draftId].lastActivity = Date.now();
-		if (currStates[draftId].timer) {
-			clearInterval(currStates[draftId].timer);
-			currStates[draftId].timer = null
-		}
-		let timeLeft = 30;
-		currStates[draftId].timer = setInterval(() => {
-			timeLeft--;
-			io.to(draftId).emit('timerUpdate', {
-				timeLeft
-			});
-			if (timeLeft <= -3) {
-				clearInterval(currStates[draftId].timer);
-				currStates[draftId].timer = null;
-                setTimeout(() => {
-                    if (!currStates[draftId].isLocking) {
-                      io.to(draftId).emit('lockChamp');
-                    }
-                }, 100);
-			}
-		}, 1000);
+        try{
+            const draftId = data;
+            currStates[draftId].started = true;
+            currStates[draftId].lastActivity = Date.now();
+            if (currStates[draftId].timer) {
+                clearInterval(currStates[draftId].timer);
+                currStates[draftId].timer = null
+            }
+            let timeLeft = 30;
+            currStates[draftId].timer = setInterval(() => {
+                timeLeft--;
+                io.to(draftId).emit('timerUpdate', {
+                    timeLeft
+                });
+                if (timeLeft <= -3) {
+                    clearInterval(currStates[draftId].timer);
+                    currStates[draftId].timer = null;
+                    setTimeout(() => {
+                        if (!currStates[draftId].isLocking) {
+                        io.to(draftId).emit('lockChamp');
+                        }
+                    }, 100);
+                }
+            }, 1000);
+        } catch (error) {
+            log(`Error starting timer: ${error.message}`);
+        }
 	});
 
 
 	socket.on('getData', (draftId) => { //sends the state to people who open page
-		if (!currStates[draftId] || currStates[draftId].finished) {
-			socket.emit('draftState', {
-				finished: true
-			});
-			return;
-		}
+        try{
+            if (!currStates[draftId] || currStates[draftId].finished) {
+                socket.emit('draftState', {
+                    finished: true
+                });
+                return;
+            }
 
-		//data = everything except timer
-		data = {
-			blueReady: currStates[draftId].blueReady,
-			redReady: currStates[draftId].redReady,
-			picks: currStates[draftId].picks,
-			started: currStates[draftId].started,
-			fearlessBans: currStates[draftId].fearlessBans,
-			matchNumber: currStates[draftId].matchNumber,
-			sideSwapped: currStates[draftId].sideSwapped,
-			blueTeamName: currStates[draftId].blueTeamName,
-			redTeamName: currStates[draftId].redTeamName
-		};
-		socket.emit('draftState', data);
+            //data = everything except timer
+            data = {
+                blueReady: currStates[draftId].blueReady,
+                redReady: currStates[draftId].redReady,
+                picks: currStates[draftId].picks,
+                started: currStates[draftId].started,
+                fearlessBans: currStates[draftId].fearlessBans,
+                matchNumber: currStates[draftId].matchNumber,
+                sideSwapped: currStates[draftId].sideSwapped,
+                blueTeamName: currStates[draftId].blueTeamName,
+                redTeamName: currStates[draftId].redTeamName
+            };
+            socket.emit('draftState', data);
+        } catch (error) {
+            log(`Error getting data: ${error.message}`);
+        }
 	});
     
     socket.on('hover', (data) => { //hovering over champ
-        socket.to(data.draftId).emit('hover', data.champion);
+        try{
+            socket.to(data.draftId).emit('hover', data.champion);
+        } catch (error) {
+            log(`Error hovering over champ: ${error.message}`);
+        }
     });
 
 	socket.on('pickSelection', (data) => { //new pick made
 		const {draftId, pick} = data;
-        try{
+        try {
             if(currStates[draftId].isLocking) {
                 return;
             }
-        } catch {
-            console.log("Pick selection error:",currStates[draftId])
+            currStates[draftId].isLocking = true;
+            currStates[draftId].lastActivity = Date.now();
+            if (currStates[draftId]) {
+                currStates[draftId].picks.push(pick);
+                io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
+                setTimeout(() => {
+                    currStates[draftId].isLocking = false;
+                }, 100);
+            }
+        } catch(error) {
+            log("Pick selection error:", currStates[draftId], error);
             return;
         }
-        currStates[draftId].isLocking = true;
-		currStates[draftId].lastActivity = Date.now();
-		if (currStates[draftId]) {
-			currStates[draftId].picks.push(pick);
-			io.to(draftId).emit('pickUpdate', currStates[draftId].picks);
-            setTimeout(() => {
-                currStates[draftId].isLocking = false;
-            }, 100);
-		}
 	});
 
 	socket.on('endDraft', (draftId) => { //ends draft
-		if (currStates[draftId].timer) {
-			clearInterval(currStates[draftId].timer);
-			currStates[draftId].timer = null;
-		}
-		currStates[draftId].blueReady = false;
-		currStates[draftId].redReady = false;
-		currStates[draftId].started = false;
-		saveDraft(draftId, currStates[draftId].picks, currStates[draftId].fearlessBans, currStates[draftId].matchNumber, currStates[draftId].blueTeamName, currStates[draftId].redTeamName);
-		currStates[draftId].matchNumber++;
-		currStates[draftId].lastActivity = Date.now();
-		if (currStates[draftId].matchNumber > 5) { //5 games total
-			currStates[draftId].finished = true;
-		}
-		io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+        try{
+            if (currStates[draftId].timer) {
+                clearInterval(currStates[draftId].timer);
+                currStates[draftId].timer = null;
+            }
+            currStates[draftId].blueReady = false;
+            currStates[draftId].redReady = false;
+            currStates[draftId].started = false;
+            saveDraft(draftId, currStates[draftId].picks, currStates[draftId].fearlessBans, currStates[draftId].matchNumber, currStates[draftId].blueTeamName, currStates[draftId].redTeamName);
+            currStates[draftId].matchNumber++;
+            currStates[draftId].lastActivity = Date.now();
+            if (currStates[draftId].matchNumber > 5) { //5 games total
+                currStates[draftId].finished = true;
+            }
+            io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+        } catch (error) {
+            log(`Error ending draft: ${error.message}`);
+        }
 	});
     
 
 	socket.on('switchSides', (draftId) => { //switches sides 
-		if (currStates[draftId]) {
-			currStates[draftId].sideSwapped = !currStates[draftId].sideSwapped;
-			currStates[draftId].blueReady = false;
-			currStates[draftId].redReady = false;
-			if (currStates[draftId].blueTeamName === 'Blue' || currStates[draftId].redTeamName === 'Red') {
-				io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
-				return;
-			}
-			const temp = currStates[draftId].blueTeamName;
-			currStates[draftId].blueTeamName = currStates[draftId].redTeamName;
-			currStates[draftId].redTeamName = temp;
-			io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
-		}
+        try{
+            if (currStates[draftId]) {
+                currStates[draftId].sideSwapped = !currStates[draftId].sideSwapped;
+                currStates[draftId].blueReady = false;
+                currStates[draftId].redReady = false;
+                if (currStates[draftId].blueTeamName === 'Blue' || currStates[draftId].redTeamName === 'Red') {
+                    io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
+                    return;
+                }
+                const temp = currStates[draftId].blueTeamName;
+                currStates[draftId].blueTeamName = currStates[draftId].redTeamName;
+                currStates[draftId].redTeamName = temp;
+                io.to(draftId).emit('switchSidesResponse', currStates[draftId]);
+            }
+        } catch (error) {
+            log(`Error switching sides: ${error.message}`);
+        }
 	});
 
     socket.on('endSeries', (draftId) => { //ends draft
-        if(currStates[draftId]){
-            currStates[draftId].finished = true;
-            io.to(draftId).emit('showNextGameButton', currStates[draftId]);
-            delete currStates[draftId];
+        try{
+            if(currStates[draftId]){
+                currStates[draftId].finished = true;
+                io.to(draftId).emit('showNextGameButton', currStates[draftId]);
+                delete currStates[draftId];
+            }
+        } catch (error) {
+            log(`Error ending series: ${error.message}`);
         }
 	});
 
@@ -357,12 +404,12 @@ io.on('connection', (socket) => {
 				socket.emit('showDraftResponse', null);
 			}
 		} catch (error) {
-			console.error('Error showing draft:', error);
+			log('Error showing draft:', error);
 		}
 	});
 });
 
 const port = process.env.PORT || 3333;
 server.listen(port, () => {
-	console.log(`Server is running on port ${port}`);
+	log(`Server is running on port ${port}`);
 });

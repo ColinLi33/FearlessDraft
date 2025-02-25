@@ -1,6 +1,6 @@
 # Fearless Draft Simulator for League of Legends
 
-Welcome to Fearless Draft! This allows you to do fearless drafting up to 4 games of full fearless.
+Welcome to Fearless Draft! This allows you to do fearless drafting up to 5 games of full fearless.
 
 ## Website
 

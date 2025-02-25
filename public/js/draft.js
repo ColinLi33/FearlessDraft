@@ -381,13 +381,13 @@ function lockChamp() { //lock in champ
 	}
 	if (selectedChampion) {
 		const championName = selectedChampion.alt;
-		selectedChampion = null;
 		confirmButton.disabled = true;
 		usedChamps.add(championName);
 		socket.emit('pickSelection', {
-			draftId,
+            draftId,
 			pick: championName
 		});
+        selectedChampion = null;
 	} else {
 		socket.emit('pickSelection', {
 			draftId,

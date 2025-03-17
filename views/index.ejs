@@ -22,13 +22,14 @@
     function createDraft() {
       const blueTeamName = document.getElementById('blue-team-name').value;
       const redTeamName = document.getElementById('red-team-name').value;
+      const timerEnabled = document.getElementById('timer-enabled').checked;
 
       fetch('/create-draft', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ blueTeamName, redTeamName })
+        body: JSON.stringify({ blueTeamName, redTeamName, timerEnabled })
       })
       .then(response => response.json())
       .then(data => {
@@ -87,6 +88,9 @@
     <br>
     <label for="red-team-name">Red Team Name:</label>
     <input type="text" id="red-team-name" value="Team 2" required>
+    <br>
+    <label>Enable Timer</label>
+    <input type="checkbox" id="timer-enabled" checked>
     <br>
     <button onclick="createDraft()">Create Draft</button>
   </div>

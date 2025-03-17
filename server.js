@@ -175,6 +175,7 @@ app.post('/create-draft', (req, res) => {
     try{
         const blueTeamName = req.body.blueTeamName;
         const redTeamName = req.body.redTeamName;
+        const timerEnabled = req.body.timerEnabled;
         const draftId = nanoid(8);
         const blueLink = `${domain}/draft/${draftId}/team1`;
         const redLink = `${domain}/draft/${draftId}/team2`;
@@ -182,6 +183,7 @@ app.post('/create-draft', (req, res) => {
         currStates[draftId] = {
             blueTeamName: blueTeamName,
             redTeamName: redTeamName,
+            timerEnabled: timerEnabled,
             blueReady: false,
             redReady: false,
             picks: [],
@@ -247,9 +249,12 @@ io.on('connection', (socket) => {
         }
 	});
 
-	socket.on('startTimer', (data) => {
+	socket.on('startTimer', (draftId) => {
         try{
-            const draftId = data;
+            const draft = currStates[draftId];
+            if(!draft.timerEnabled) {
+                return;
+            }
             currStates[draftId].started = true;
             currStates[draftId].lastActivity = Date.now();
             if (currStates[draftId].timer) {
@@ -297,6 +302,7 @@ io.on('connection', (socket) => {
                 matchNumber: currStates[draftId].matchNumber,
                 sideSwapped: currStates[draftId].sideSwapped,
                 blueTeamName: currStates[draftId].blueTeamName,
+                timerEnabled: currStates[draftId].timerEnabled,
                 redTeamName: currStates[draftId].redTeamName
             };
             socket.emit('draftState', data);

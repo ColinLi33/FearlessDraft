@@ -25,10 +25,12 @@ let viewingPreviousDraft = false;
 let isLocking = false;
 
 
-
 function startTimer() {
-	socket.emit('startTimer', draftId);
+	if(currPick > 0){
+        socket.emit('startTimer', draftId);
+    }
 }
+
 
 async function loadChamps() { //preload champion grid images
     try{
@@ -331,6 +333,13 @@ function colorBorder() { //shows who is picking currently
 }
 
 
+function displayTimer(show) {
+    const timerContainer = document.querySelector('.timer-container');
+    if (timerContainer) {
+        timerContainer.style.display = show ? 'block' : 'none';
+    }
+}
+
 
 function updateFearlessBanSlots() { //controls fearless bans
 	const blueFearlessBanSlots = document.querySelectorAll('#blue-fearless-bans .fearless-ban-slot');
@@ -562,14 +571,13 @@ socket.on('startDraft', (data) => { //starts draft
 	matchNumber = data.matchNumber;
 	usedChamps = new Set();
 	updateFearlessBanSlots();
+    displayTimer(data.timerEnabled);
 	fearlessBan(data.fearlessBans);
 	startDraft();
 });
 
 socket.on('timerUpdate', (data) => { //updates timer
-	const {
-		timeLeft
-	} = data;
+	const { timeLeft } = data;
 	const timerElement = document.getElementById('timer');
 	timerElement.textContent = timeLeft >= 0 ? timeLeft : 0;
 });
@@ -587,6 +595,7 @@ socket.on('draftState', (data) => { //updates screen when page loaded with draft
 	fearlessChamps = new Set(data.fearlessBans);
 	matchNumber = data.matchNumber;
 	sideSwapped = data.sideSwapped;
+    displayTimer(data.timerEnabled);
 	updateSide(sideSwapped, data.blueTeamName, data.redTeamName, true);
 	updateFearlessBanSlots();
 	fearlessBan(data.fearlessBans);

@@ -1,5 +1,5 @@
 const socket = io();
-const patch = '15.15.1'
+const patch = '15.23.1'
 const baseUrl = `https://ddragon.leagueoflegends.com/cdn/${patch}`
 let champions = null;
 let currPick = 0;
